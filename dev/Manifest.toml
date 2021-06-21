@@ -116,9 +116,9 @@ version = "0.8.13"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "4289a76df5a8568cca9970e54dd585c6c395c496"
+git-tree-sha1 = "ea05cadc30c15f9185b61ea418b9d47d53b55bc2"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.7"
+version = "0.10.8"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random", "StaticArrays"]
@@ -682,9 +682,9 @@ version = "0.4.7"
 
 [[LoopVectorization]]
 deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Polyester", "Requires", "SLEEFPirates", "Static", "StrideArraysCore", "ThreadingUtilities", "UnPack", "VectorizationBase"]
-git-tree-sha1 = "b1481bc7119fedafd04d81fe6483eacccb7a064b"
+git-tree-sha1 = "0d353c52a418e1d97b7a39d192331157f71b2389"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
-version = "0.12.41"
+version = "0.12.42"
 
 [[MCMCChains]]
 deps = ["AbstractFFTs", "AbstractMCMC", "AxisArrays", "Compat", "Dates", "Distributions", "Formatting", "IteratorInterfaceExtensions", "LinearAlgebra", "MLJModelInterface", "NaturalSort", "PrettyTables", "Random", "RecipesBase", "Serialization", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "TableTraits", "Tables"]
@@ -941,10 +941,10 @@ uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
 version = "0.3.2"
 
 [[RecursiveArrayTools]]
-deps = ["ArrayInterface", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "b3f4e34548b3d3d00e5571fd7bc0a33980f01571"
+deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics"]
+git-tree-sha1 = "c53e1ef7b21778d671d372631e9b4aa9b5eaea6b"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.11.4"
+version = "2.12.1"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization"]
@@ -1065,9 +1065,9 @@ version = "0.2.5"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "57a9b3c69933e15e5b7041b6a57d1533ef1a9882"
+git-tree-sha1 = "745914ebcd610da69f3cb6bf76cb7bb83dcb8c9a"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.3"
+version = "1.2.4"
 
 [[StatisticalTraits]]
 deps = ["ScientificTypes"]
@@ -1104,9 +1104,9 @@ version = "0.1.13"
 
 [[StringEncodings]]
 deps = ["Libiconv_jll"]
-git-tree-sha1 = "c8834c5366bdf5796c7f90aa56ef2550da084b9c"
+git-tree-sha1 = "50ccd5ddb00d19392577902f0079267a72c5ab04"
 uuid = "69024149-9ee7-55f6-a4c4-859efe599b68"
-version = "0.3.4"
+version = "0.3.5"
 
 [[StructArrays]]
 deps = ["Adapt", "DataAPI", "Tables"]
@@ -1382,9 +1382,9 @@ version = "1.2.1"
 
 [[ZeroMQ_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "libsodium_jll"]
-git-tree-sha1 = "74a74a3896b63980734cc876da8a103454559fe8"
+git-tree-sha1 = "fe5c65a526f066fb3000da137d5785d9649a8a47"
 uuid = "8f1865be-045e-5c20-9c9f-bfbfb0764568"
-version = "4.3.2+6"
+version = "4.3.4+0"
 
 [[Zlib_jll]]
 deps = ["Libdl"]
