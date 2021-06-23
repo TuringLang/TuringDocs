@@ -116,9 +116,9 @@ version = "0.8.13"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "ea05cadc30c15f9185b61ea418b9d47d53b55bc2"
+git-tree-sha1 = "be770c08881f7bb928dfd86d1ba83798f76cf62a"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.8"
+version = "0.10.9"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random", "StaticArrays"]
@@ -682,9 +682,9 @@ version = "0.4.7"
 
 [[LoopVectorization]]
 deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Polyester", "Requires", "SLEEFPirates", "Static", "StrideArraysCore", "ThreadingUtilities", "UnPack", "VectorizationBase"]
-git-tree-sha1 = "0d353c52a418e1d97b7a39d192331157f71b2389"
+git-tree-sha1 = "7be945411faf81cbcd0e02e363869dc8b3ed2344"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
-version = "0.12.42"
+version = "0.12.44"
 
 [[MCMCChains]]
 deps = ["AbstractFFTs", "AbstractMCMC", "AxisArrays", "Compat", "Dates", "Distributions", "Formatting", "IteratorInterfaceExtensions", "LinearAlgebra", "MLJModelInterface", "NaturalSort", "PrettyTables", "Random", "RecipesBase", "Serialization", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "TableTraits", "Tables"]
@@ -936,9 +936,9 @@ version = "1.1.1"
 
 [[RecipesPipeline]]
 deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
-git-tree-sha1 = "7a5026a6741c14147d1cb6daf2528a77ca28eb51"
+git-tree-sha1 = "9b8e57e3cca8828a1bc759840bfe48d64db9abfb"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
-version = "0.3.2"
+version = "0.3.3"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
@@ -998,9 +998,9 @@ version = "0.2.0"
 
 [[SciMLBase]]
 deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "23b6b88b0c69a1666bd91cbf9d1216588721615c"
+git-tree-sha1 = "0b5b04995a3208f82ae69a17389c60b762000793"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.13.5"
+version = "1.13.6"
 
 [[ScientificTypes]]
 git-tree-sha1 = "b4e89a674804025c4a5843e35e562910485690c2"
@@ -1136,9 +1136,9 @@ version = "1.0.1"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
-git-tree-sha1 = "aa30f8bb63f9ff3f8303a06c604c8500a69aa791"
+git-tree-sha1 = "8ed4a3ea724dac32670b062be3ef1c1de6773ae8"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.4.3"
+version = "1.4.4"
 
 [[Tar]]
 deps = ["ArgTools", "SHA"]
