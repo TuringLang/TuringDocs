@@ -942,9 +942,9 @@ version = "0.3.3"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "e02e7b7982312c143662cd09fd86949a7336c945"
+git-tree-sha1 = "c33d222e178a3e644f4830e38c20e51b23bf9686"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.13.0"
+version = "2.14.0"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization"]
@@ -998,9 +998,9 @@ version = "0.2.0"
 
 [[SciMLBase]]
 deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "0b5b04995a3208f82ae69a17389c60b762000793"
+git-tree-sha1 = "7d60436171978e9b4f73790ebf436fccd307df51"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.13.6"
+version = "1.14.0"
 
 [[ScientificTypes]]
 git-tree-sha1 = "b4e89a674804025c4a5843e35e562910485690c2"
