@@ -110,9 +110,9 @@ version = "1.16.0+6"
 
 [[ChainRules]]
 deps = ["ChainRulesCore", "Compat", "LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "df2f310b991d6cdc3fe317f9a4e5472a8d690af1"
+git-tree-sha1 = "e7e3200bd24b77bcc849e6616f7c2f0d45d70f5b"
 uuid = "082447d4-558c-5d27-93f4-14fc19e9eca2"
-version = "0.8.15"
+version = "0.8.17"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
@@ -406,9 +406,9 @@ version = "0.57.3+0"
 
 [[GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
-git-tree-sha1 = "4136b8a5668341e58398bb472754bff4ba0456ff"
+git-tree-sha1 = "15ff9a14b9e1218958d3530cc288cf31465d9ae2"
 uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
-version = "0.3.12"
+version = "0.3.13"
 
 [[Gettext_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
@@ -693,10 +693,10 @@ uuid = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
 version = "4.12.0"
 
 [[MLJModelInterface]]
-deps = ["Random", "ScientificTypes", "StatisticalTraits"]
-git-tree-sha1 = "cafa0e923ce1ae659a4b4cb8eb03c98b916f0d4d"
+deps = ["Random", "ScientificTypesBase", "StatisticalTraits"]
+git-tree-sha1 = "55c785a68d71c5fd7b64b490e0d9ab18cf13a04c"
 uuid = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
-version = "1.1.0"
+version = "1.1.1"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
@@ -942,9 +942,9 @@ version = "0.3.3"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "c33d222e178a3e644f4830e38c20e51b23bf9686"
+git-tree-sha1 = "28156897ef216fbc1f182d9189fd2b00ec41f510"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.14.0"
+version = "2.14.2"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization"]
@@ -1002,10 +1002,10 @@ git-tree-sha1 = "7d60436171978e9b4f73790ebf436fccd307df51"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 version = "1.14.0"
 
-[[ScientificTypes]]
-git-tree-sha1 = "b4e89a674804025c4a5843e35e562910485690c2"
-uuid = "321657f4-b219-11e9-178b-2701a2544e81"
-version = "1.1.2"
+[[ScientificTypesBase]]
+git-tree-sha1 = "3f7ddb0cf0c3a4cff06d9df6f01135fa5442c99b"
+uuid = "30f210dd-8aff-4c5f-94ba-8e64358c1161"
+version = "1.0.0"
 
 [[Scratch]]
 deps = ["Dates"]
@@ -1076,10 +1076,10 @@ uuid = "90137ffa-7385-5640-81b9-e52037218182"
 version = "1.2.4"
 
 [[StatisticalTraits]]
-deps = ["ScientificTypes"]
-git-tree-sha1 = "2d882a163c295d5d754e4102d92f4dda5a1f906b"
+deps = ["ScientificTypesBase"]
+git-tree-sha1 = "5114841829816649ecc957f07f6a621671e4a951"
 uuid = "64bff920-2084-43da-a3e6-9bb72801c0c9"
-version = "1.1.0"
+version = "2.0.0"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -1115,10 +1115,10 @@ uuid = "69024149-9ee7-55f6-a4c4-859efe599b68"
 version = "0.3.5"
 
 [[StructArrays]]
-deps = ["Adapt", "DataAPI", "Tables"]
-git-tree-sha1 = "44b3afd37b17422a62aea25f04c1f7e09ce6b07f"
+deps = ["Adapt", "DataAPI", "StaticArrays", "Tables"]
+git-tree-sha1 = "000e168f5cc9aded17b6999a560b7c11dda69095"
 uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
-version = "0.5.1"
+version = "0.6.0"
 
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
