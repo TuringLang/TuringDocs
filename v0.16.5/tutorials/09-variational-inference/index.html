@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-language" content="en">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Variational inference (VI) in Turing.jl</title>
+    <meta name="description" content="Variational inference (VI) in Turing.jl">
+    <meta name="author" content="The Turing Team">
+    <meta name="theme-color" content="red">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+    <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="canonical" href="/dev/tutorials/09-variational-inference/">
+    <link rel="alternate" type="application/rss+xml" title="Turing.jl" href="/dev/feed.xml">
+    <meta name="lang:clipboard.copy" content="Copy to clipboard">
+    <meta name="lang:clipboard.copied" content="Copied to clipboard">
+    <meta name="lang:search.language" content="en">
+    <meta name="lang:search.pipeline.stopwords" content="True">
+    <meta name="lang:search.pipeline.trimmer" content="True">
+    <meta name="lang:search.result.none" content="No matching documents">
+    <meta name="lang:search.result.one" content="1 matching document">
+    <meta name="lang:search.result.other" content="# matching documents">
+    <meta name="lang:search.tokenizer" content="[\s\-]+">
+    <script src="/versions.js"></script>
+    <script src="/dev/assets/js/modernizr.74668098.js"></script>
+    <link rel="shortcut icon" href="/dev/assets/img/favicon.ico">
+    <link rel="stylesheet" href="/dev/assets/css/main.css">
+    <link rel="stylesheet" href="/dev/assets/css/palette.css">
+    <link rel="stylesheet" href="/dev/assets/css/header.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+
+    
+
+  </head>
+
+  <body dir="ltr" data-md-color-primary="red" data-md-color-accent="red">
+    
+
+<svg class="md-svg">
+<defs>
+  <svg>
+  <path d="M160 304q0 10-3.125 20.5t-10.75 19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75 19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360 304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25 2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75 1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75 0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5 46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z" fill="currentColor"></path></svg>
+</defs></svg>
+
+    <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off>
+    <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off>
+    <label class=md-overlay data-md-component=overlay for=__drawer></label> <a href="#variational-inference-vi-in-turing-jl" tabindex=1 class=md-skip> Skip to content </a>
+    <header class=md-header data-md-component=header data-md-state=none>
+        <nav class="md-header-nav md-grid">
+            <div class=md-flex>
+                <div class="md-flex__cell md-flex__cell--shrink">
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer></label>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <a class="md-header-nav__button md-logo" href="/dev/" title="Turing.jl">
+                    <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title>
+                        <span class=md-header-nav__topic>Turing.jl</span>
+                    </div>
+                    </a>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <div class="dropdown version-switch">
+                      <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      </a>
+                      <div class="dropdown-menu">
+                        <!-- a class="dropdown-item" href="#">Stable</a -->
+                        <!-- div class="dropdown-divider"></div -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a class="md-source" href="/dev/docs/using-turing/get-started" title="Get started">
+                      Get Started
+                    </a>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <div class="md-header-nav__source">
+                      <a class="md-source" href="/dev/docs/using-turing/" title="View documentation">
+                        Documentation
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/tutorials/" title="View tutorials">
+                          Tutorials
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/news/" title="News">
+                          News
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/team/" title="Team">
+                          Team
+                        </a>
+                      </div>
+                    </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a class="md-source" data-md-source="github" href="https://github.com/TuringLang/Turing.jl" title="Go to repository">
+                    <div class="md-source__icon" style="padding-top:5px">
+                      <i class="fa fa-github fa-3x"></i>
+                    </div>
+                    <div class="md-source__repository">
+                      TuringLang/Turing.jl
+                    </div></a>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a href="https://twitter.com/TuringLang?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+                       data-size="large" data-show-screen-name="false" data-show-count="false">Follow @TuringLang</a>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <label class="md-icon md-icon--search md-header-nav__button" for=__search></label>
+                    <div class=md-search data-md-component=search role=dialog>
+                        <label class=md-search__overlay for=__search></label>
+                        <div class=md-search__inner role=search>
+                            <form class=md-search__form name=search>
+                                <input type=text class=md-search__input name=query placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=query data-md-state=active>
+                                <label class="md-icon md-search__icon" for=__search></label>
+                                <button type=reset class="md-icon md-search__icon" data-md-component=reset tabindex=-1> &#xE5CD; </button>
+                            </form>
+                            <div class=md-search__output>
+                                <div class=md-search__scrollwrap data-md-scrollfix>
+                                    <div class=md-search-result data-md-component=result>
+                                        <div class=md-search-result__meta> Type to start searching </div>
+                                        <ol class=md-search-result__list></ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+  </nav>
+</header>
+
+
+    <div class="md-container">
+        <main class="md-main">
+            <div class="md-main__inner md-grid full-width" data-md-component="container">
+            
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+  <div class="md-sidebar__scrollwrap">
+    <div class="md-sidebar__inner">
+      <nav class="md-nav md-nav--primary" data-md-level="0">
+
+        <label class="md-nav__title md-nav__title--site">
+            <a class="" href="/dev/" title="Turing.jl">
+              <span class="md-nav__button md-logo">
+                Turing.jl
+              </span>
+            </a>
+        </label>
+
+        <ul class="md-nav__list" data-md-scrollfix="">
+          <li class="md-nav__item md-nav__item--active">
+            <input class="md-toggle md-nav__toggle" data-md-toggle="toc" id="__toc" type="checkbox" />
+
+            <nav class="md-nav md-nav--secondary">
+
+                <a class="" href="/dev/" title="Turing.jl">
+                  <label class="md-nav__title md-nav__title--site">
+                    <span class="md-nav__button md-logo">
+                      Turing.jl
+                    </span>
+                  </label>
+                </a>
+
+                <div class="md-nav__source">
+                    <a class="md-source" data-md-source="github" href="https://github.com/TuringLang/Turing.jl" title="Go to repository">
+                    <span class="md-source__icon">
+                        <i class="fa fa-github fa-3x"></i>
+                    </span>
+                    <span class="md-source__repository">
+                      TuringLang/Turing.jl
+                    </span></a>
+                </div>
+
+                <div class="md-nav__dropdown">
+                  <select id="version-selector">
+                    <!-- option value="#" selected="selected">v 0.5.1</option -->
+                  </select>
+                </div>
+
+              <label class="md-nav__title" for="__drawer"></label>
+
+              
+
+                <ul class="md-nav__list" data-md-scrollfix="">
+                  
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-using-turing" title="USING TURING">USING TURING</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/get-started"
+                              id="pancakes-getting-started"
+                              title="Getting Started">Getting Started</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/quick-start"
+                              id="pancakes-quick-start"
+                              title="Quick Start">Quick Start</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/guide"
+                              id="pancakes-guide"
+                              title="Guide">Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/advanced"
+                              id="pancakes-advanced-usage"
+                              title="Advanced Usage">Advanced Usage</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/autodiff"
+                              id="pancakes-automatic-differentiation"
+                              title="Automatic Differentiation">Automatic Differentiation</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/performancetips"
+                              id="pancakes-performance-tips"
+                              title="Performance Tips">Performance Tips</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/dynamichmc"
+                              id="pancakes-using-dynamichmc"
+                              title="Using DynamicHMC">Using DynamicHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/sampler-viz"
+                              id="pancakes-sampler-visualization"
+                              title="Sampler Visualization">Sampler Visualization</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-for-developers" title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/compiler"
+                              id="pancakes-turing-compiler-design"
+                              title="Turing Compiler Design">Turing Compiler Design</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/interface"
+                              id="pancakes-interface-guide"
+                              title="Interface Guide">Interface Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/how_turing_implements_abstractmcmc"
+                              id="pancakes-how-turing-implements-abstractmcmc"
+                              title="How Turing implements AbstractMCMC">How Turing implements AbstractMCMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/variational_inference"
+                              id="pancakes-variational-inference"
+                              title="Variational Inference">Variational Inference</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-tutorials" title="TUTORIALS">TUTORIALS</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials"
+                              id="pancakes-home"
+                              title="Home">Home</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/00-introduction"
+                              id="pancakes-introduction-to-turing"
+                              title="Introduction to Turing">Introduction to Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/01-gaussian-mixture-model"
+                              id="pancakes-gaussian-mixture-models"
+                              title="Gaussian Mixture Models">Gaussian Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/02-logistic-regression"
+                              id="pancakes-bayesian-logistic-regression"
+                              title="Bayesian Logistic Regression">Bayesian Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/03-bayesian-neural-network"
+                              id="pancakes-bayesian-neural-networks"
+                              title="Bayesian Neural Networks">Bayesian Neural Networks</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/04-hidden-markov-model"
+                              id="pancakes-hidden-markov-models"
+                              title="Hidden Markov Models">Hidden Markov Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/05-linear-regression"
+                              id="pancakes-linear-regression"
+                              title="Linear Regression">Linear Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/06-infinite-mixture-model"
+                              id="pancakes-infinite-mixture-models"
+                              title="Infinite Mixture Models">Infinite Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/07-poisson-regression"
+                              id="pancakes-bayesian-poisson-regression"
+                              title="Bayesian Poisson Regression">Bayesian Poisson Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/08-multinomial-logistic-regression"
+                              id="pancakes-multinomial-logistic-regression"
+                              title="Multinomial Logistic Regression">Multinomial Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/09-variational-inference"
+                              id="pancakes-variational-inference"
+                              title="Variational Inference">Variational Inference</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/10-bayesian-differential-equations"
+                              id="pancakes-bayesian-differential-equation"
+                              title="Bayesian Differential Equation">Bayesian Differential Equation</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-api" title="API">API</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library"
+                              id="pancakes-turing"
+                              title="Turing">Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library/advancedhmc/"
+                              id="pancakes-advancedhmc"
+                              title="AdvancedHMC">AdvancedHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library/bijectors/"
+                              id="pancakes-bijectors"
+                              title="Bijectors">Bijectors</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-contributing" title="CONTRIBUTING">CONTRIBUTING</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/contributing/guide"
+                              id="pancakes-how-to-contribute"
+                              title="How to Contribute">How to Contribute</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/contributing/style-guide"
+                              id="pancakes-style-guide"
+                              title="Style Guide">Style Guide</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                </ul>
+            </nav>
+          </li>
+
+          <!-- This navigation is completely for mobile -->
+          <li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="USING TURING">USING TURING</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="TUTORIALS">TUTORIALS</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="API">API</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="CONTRIBUTING">CONTRIBUTING</a>
+          </li>
+
+          <!-- This navigation is completely for non mobile -->
+          
+
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-using-turing"
+                title="USING TURING">USING TURING</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/get-started"
+                           title="Getting Started" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Getting Started</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/quick-start"
+                           title="Quick Start" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Quick Start</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/guide"
+                           title="Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/advanced"
+                           title="Advanced Usage" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Advanced Usage</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/autodiff"
+                           title="Automatic Differentiation" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Automatic Differentiation</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/performancetips"
+                           title="Performance Tips" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Performance Tips</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/dynamichmc"
+                           title="Using DynamicHMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Using DynamicHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/sampler-viz"
+                           title="Sampler Visualization" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Sampler Visualization</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-for-developers"
+                title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/compiler"
+                           title="Turing Compiler Design" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Turing Compiler Design</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/interface"
+                           title="Interface Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Interface Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/how_turing_implements_abstractmcmc"
+                           title="How Turing implements AbstractMCMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">How Turing implements AbstractMCMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/variational_inference"
+                           title="Variational Inference" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Variational Inference</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent open-parent"
+                id="pancakes-tutorials"
+                title="TUTORIALS">TUTORIALS</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials"
+                           title="Home" 
+                           
+                           class="md-nav__link pancakes-child">Home</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/00-introduction"
+                           title="Introduction to Turing" 
+                           
+                           class="md-nav__link pancakes-child">Introduction to Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/01-gaussian-mixture-model"
+                           title="Gaussian Mixture Models" 
+                           
+                           class="md-nav__link pancakes-child">Gaussian Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/02-logistic-regression"
+                           title="Bayesian Logistic Regression" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/03-bayesian-neural-network"
+                           title="Bayesian Neural Networks" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Neural Networks</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/04-hidden-markov-model"
+                           title="Hidden Markov Models" 
+                           
+                           class="md-nav__link pancakes-child">Hidden Markov Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/05-linear-regression"
+                           title="Linear Regression" 
+                           
+                           class="md-nav__link pancakes-child">Linear Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/06-infinite-mixture-model"
+                           title="Infinite Mixture Models" 
+                           
+                           class="md-nav__link pancakes-child">Infinite Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/07-poisson-regression"
+                           title="Bayesian Poisson Regression" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Poisson Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/08-multinomial-logistic-regression"
+                           title="Multinomial Logistic Regression" 
+                           
+                           class="md-nav__link pancakes-child">Multinomial Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/09-variational-inference"
+                           title="Variational Inference" 
+                            style="color: red;"
+                           class="md-nav__link pancakes-child">Variational Inference</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/10-bayesian-differential-equations"
+                           title="Bayesian Differential Equation" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Differential Equation</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-api"
+                title="API">API</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library"
+                           title="Turing" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library/advancedhmc/"
+                           title="AdvancedHMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">AdvancedHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library/bijectors/"
+                           title="Bijectors" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Bijectors</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-contributing"
+                title="CONTRIBUTING">CONTRIBUTING</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/contributing/guide"
+                           title="How to Contribute" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">How to Contribute</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/contributing/style-guide"
+                           title="Style Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Style Guide</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+<div class="md-sidebar md-sidebar--secondary invisible" data-md-component="toc">
+  <div class="md-sidebar__scrollwrap">
+    <div class="md-sidebar__inner">
+      <nav class="md-nav md-nav--secondary">
+        <label class="md-nav__title" for="__toc">Table of contents</label>
+        <ul id="nav-toc" class="md-nav__list" data-md-scrollfix="">
+        <!-- toc will be appended here!-->
+        </ul>
+        <a href="https://twitter.com/intent/tweet?original_referer=https://github.com/TuringLang/Turing.jl/edit/master/docs/src_tutorials/09_variational-inference.md" title="Tweet this page" class="social-link"><i class="fa fa-twitter fa-1x"></i>Tweet this page</a>
+        <a href="https://discourse.julialang.org/c/domain/probprog" title="Ask questions" class="social-link"><i class="fa fa-stack-overflow fa-1x"></i>Ask questions</a>
+        <a href="https://github.com/TuringLang/Turing.jl//issues/new?label=question&title=Question:&body=Question%20on:%20https://github.com/TuringLang/Turing.jl/edit/master/docs/_tutorials/09_variational-inference.md" title="Report issues" class="social-link"><i class="fa fa-comments fa-1x"></i>Report issues</a>
+        <a href="https://github.com/TuringLang/Turing.jl/edit/master/docs/src_tutorials/09_variational-inference.md" title="Edit this page on github"  class="social-link"><i class="fa fa-github fa-1x"></i> Edit me</a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+                <div id="md-container-pancakes">
+                <div class="md-content full-width"> 
+    <article class="md-content__inner md-typeset  full-width">
+    <h1 id="variational-inference-vi-in-turingjl">Variational inference (VI) in Turing.jl</h1>
+<p>In this post we'll have a look at what's know as <strong>variational inference (VI)</strong>, a family of <em>approximate</em> Bayesian inference methods, and how to use it in Turing.jl as an alternative to other approaches such as MCMC. In particular, we will focus on one of the more standard VI methods called <strong>Automatic Differentation Variational Inference (ADVI)</strong>.</p>
+<p>Here we will focus on how to use VI in Turing and not much on the theory underlying VI. If you're interested in understanding the mathematics you can checkout <a href="../../docs/for-developers/variational_inference">our write-up</a> or any other resource online (there a lot of great ones).</p>
+<p>Using VI in Turing.jl is very straight forward. If <code>model</code> denotes a definition of a <code>Turing.Model</code>, performing VI is as simple as</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="x">(</span><span class="n">data</span><span class="o">...</span><span class="x">)</span> <span class="c"># instantiate model on the data</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">vi_alg</span><span class="x">)</span>  <span class="c"># perform VI on `m` using the VI method `vi_alg`, which returns a `VariationalPosterior`</span>
+</code></pre></div></div>
+<p>Thus it's no more work than standard MCMC sampling in Turing.</p>
+<p>To get a bit more into what we can do with <code>vi</code>, we'll first have a look at a simple example and then we'll reproduce the <a href="../../tutorials/5-linearregression">tutorial on Bayesian linear regression</a> using VI instead of MCMC. Finally we'll look at some of the different parameters of <code>vi</code> and how you for example can use your own custom variational family.</p>
+<h2 id="setup">Setup</h2>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">Random</span>
+<span class="k">using</span> <span class="n">Turing</span>
+<span class="k">using</span> <span class="n">Turing</span><span class="o">:</span> <span class="n">Variational</span>
+
+<span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="x">(</span><span class="mi">42</span><span class="x">);</span>
+</code></pre></div></div>
+<h2 id="simple-example-normal-gamma-conjugate-model">Simple example: Normal-Gamma conjugate model</h2>
+<p>The Normal-(Inverse)Gamma conjugate model is defined by the following generative process</p>
+<p>\begin{align}
+s &amp;\sim \mathrm{InverseGamma}(2, 3) \\
+m &amp;\sim \mathcal{N}(0, s) \\
+x_i &amp;\overset{\text{i.i.d.}}{=} \mathcal{N}(m, s), \quad i = 1, \dots, n
+\end{align}</p>
+<p>Recall that <em>conjugate</em> refers to the fact that we can obtain a closed-form expression for the posterior. Of course one wouldn't use something like variational inference for a conjugate model, but it's useful as a simple demonstration as we can compare the result to the true posterior.</p>
+<p>First we generate some synthetic data, define the <code>Turing.Model</code> and instantiate the model on the data:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># generate data</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">randn</span><span class="x">(</span><span class="mi">2000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@model</span> <span class="n">model</span><span class="x">(</span><span class="n">x</span><span class="x">)</span> <span class="o">=</span> <span class="k">begin</span>
+    <span class="n">s</span> <span class="o">~</span> <span class="n">InverseGamma</span><span class="x">(</span><span class="mi">2</span><span class="x">,</span> <span class="mi">3</span><span class="x">)</span>
+    <span class="n">m</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mf">0.0</span><span class="x">,</span> <span class="n">sqrt</span><span class="x">(</span><span class="n">s</span><span class="x">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="n">length</span><span class="x">(</span><span class="n">x</span><span class="x">)</span>
+        <span class="n">x</span><span class="x">[</span><span class="n">i</span><span class="x">]</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">sqrt</span><span class="x">(</span><span class="n">s</span><span class="x">))</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="x">;</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Instantiate model</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="x">(</span><span class="n">x</span><span class="x">);</span>
+</code></pre></div></div>
+<p>Now we'll produce some samples from the posterior using a MCMC method, which in constrast to VI is guaranteed to converge to the <em>exact</em> posterior (as the number of samples go to infinity).</p>
+<p>We'll produce 10 000 samples with 200 steps used for adaptation and a target acceptance rate of 0.65</p>
+<p>If you don't understand what &quot;adaptation&quot; or &quot;target acceptance rate&quot; refers to, all you really need to know is that <code>NUTS</code> is known to be one of the most accurate and efficient samplers (when applicable) while requiring little to no hand-tuning to work well.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">samples_nuts</span> <span class="o">=</span> <span class="n">sample</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">NUTS</span><span class="x">(</span><span class="mi">200</span><span class="x">,</span> <span class="mf">0.65</span><span class="x">),</span> <span class="mi">10000</span><span class="x">);</span>
+</code></pre></div></div>
+<p>Now let's try VI. The most important function you need to now about to do VI in Turing is <code>vi</code>:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@doc</span><span class="x">(</span><span class="n">Variational</span><span class="o">.</span><span class="n">vi</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>vi(model, alg::VariationalInference)
+vi(model, alg::VariationalInference, q::VariationalPosterior)
+vi(model, alg::VariationalInference, getq::Function, θ::AbstractArray)
+</code></pre>
+<p>Constructs the variational posterior from the <code>model</code> and performs the optimization following the configuration of the given <code>VariationalInference</code> instance.</p>
+<h1 id="arguments">Arguments</h1>
+<ul>
+<li><code>model</code>: <code>Turing.Model</code> or <code>Function</code> z ↦ log p(x, z) where <code>x</code> denotes the observations</li>
+<li><code>alg</code>: the VI algorithm used</li>
+<li><code>q</code>: a <code>VariationalPosterior</code> for which it is assumed a specialized implementation of the variational objective used exists.</li>
+<li><code>getq</code>: function taking parameters <code>θ</code> as input and returns a <code>VariationalPosterior</code></li>
+<li><code>θ</code>: only required if <code>getq</code> is used, in which case it is the initial parameters for the variational posterior</li>
+</ul>
+<p>Additionally, you can pass</p>
+<ul>
+<li>an initial variational posterior <code>q</code>, for which we assume there exists a implementation of <code>update(::typeof(q), θ::AbstractVector)</code> returning an updated posterior <code>q</code> with parameters <code>θ</code>.</li>
+<li>a function mapping $\theta \mapsto q_{\theta}$ (denoted above <code>getq</code>) together with initial parameters <code>θ</code>. This provides more flexibility in the types of variational families that we can use, and can sometimes be slightly more convenient for quick and rough work.</li>
+</ul>
+<p>By default, i.e. when calling <code>vi(m, advi)</code>, Turing use a <em>mean-field</em> approximation with a multivariate normal as the base-distribution. Mean-field refers to the fact that we assume all the latent variables to be <em>independent</em>. This the &quot;standard&quot; ADVI approach; see <a href="https://arxiv.org/abs/1603.00788">Automatic Differentiation Variational Inference (2016)</a> for more. In Turing, one can obtain such a mean-field approximation by calling <code>Variational.meanfield(model)</code> for which there exists an internal implementation for <code>update</code>:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@doc</span><span class="x">(</span><span class="n">Variational</span><span class="o">.</span><span class="n">meanfield</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>meanfield([rng, ]model::Model)
+</code></pre>
+<p>Creates a mean-field approximation with multivariate normal as underlying distribution.</p>
+<p>Currently the only implementation of <code>VariationalInference</code> available is <code>ADVI</code>, which is very convenient and applicable as long as your <code>Model</code> is differentiable with respect to the <em>variational parameters</em>, that is, the parameters of your variational distribution, e.g. mean and variance in the mean-field approximation.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@doc</span><span class="x">(</span><span class="n">Variational</span><span class="o">.</span><span class="n">ADVI</span><span class="x">)</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span><span class="nc"> ADVI</span><span class="x">{</span><span class="n">AD</span><span class="x">}</span> <span class="o">&lt;:</span> <span class="n">AdvancedVI</span><span class="o">.</span><span class="n">VariationalInference</span><span class="x">{</span><span class="n">AD</span><span class="x">}</span>
+</code></pre></div></div>
+<p>Automatic Differentiation Variational Inference (ADVI) with automatic differentiation backend <code>AD</code>.</p>
+<h1 id="fields">Fields</h1>
+<ul>
+<li>
+<p><code>samples_per_step::Int64</code></p>
+<p>Number of samples used to estimate the ELBO in each optimization step.</p>
+</li>
+<li>
+<p><code>max_iters::Int64</code></p>
+<p>Maximum number of gradient steps.</p>
+</li>
+</ul>
+<p>To perform VI on the model <code>m</code> using 10 samples for gradient estimation and taking 1000 gradient steps is then as simple as:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># ADVI</span>
+<span class="n">advi</span> <span class="o">=</span> <span class="n">ADVI</span><span class="x">(</span><span class="mi">10</span><span class="x">,</span> <span class="mi">1000</span><span class="x">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">advi</span><span class="x">);</span>
+</code></pre></div></div>
+<p>Unfortunately, for such a small problem Turing's new <code>NUTS</code> sampler is <em>so</em> efficient now that it's not that much more efficient to use ADVI. So, so very unfortunate...</p>
+<p>With that being said, this is not the case in general. For very complex models we'll later find that <code>ADVI</code> produces very reasonable results in a much shorter time than <code>NUTS</code>.</p>
+<p>And one significant advantage of using <code>vi</code> is that we can sample from the resulting <code>q</code> with ease. In fact, the result of the <code>vi</code> call is a <code>TransformedDistribution</code> from Bijectors.jl, and it implements the Distributions.jl interface for a <code>Distribution</code>:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q</span> <span class="k">isa</span> <span class="n">MultivariateDistribution</span>
+</code></pre></div></div>
+<pre><code>true
+</code></pre>
+<p>This means that we can call <code>rand</code> to sample from the variational posterior <code>q</code></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>2-element Array{Float64,1}:
+  1.0786295499476042
+ -0.042370317247471936
+</code></pre>
+<p>and <code>logpdf</code> to compute the log-probability</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">logpdf</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">))</span>
+</code></pre></div></div>
+<pre><code>4.268921703144813
+</code></pre>
+<p>Let's check the first and second moments of the data to see how our approximation compares to the point-estimates form the data:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">var</span><span class="x">(</span><span class="n">x</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>(1.0225001600719719, -0.027900450605557185)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">1000</span><span class="x">);</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">)</span><span class="o">...</span><span class="x">,</span> <span class="x">)</span>
+</code></pre></div></div>
+<pre><code>(1.0302721641867068, -0.027767503306100567)
+</code></pre>
+<p>That's pretty close! But we're Bayesian so we're not interested in <em>just</em> matching the mean.
+Let's instead look the actual density <code>q</code>.</p>
+<p>For that we need samples:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">samples</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">10000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># setup for plotting</span>
+<span class="k">using</span> <span class="n">Plots</span><span class="x">,</span> <span class="n">LaTeXStrings</span><span class="x">,</span> <span class="n">StatsPlots</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p1</span> <span class="o">=</span> <span class="n">histogram</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="x">,</span> <span class="n">normed</span><span class="o">=</span><span class="nb">true</span><span class="x">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (ADVI)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples_nuts</span><span class="x">,</span> <span class="o">:</span><span class="n">s</span><span class="x">;</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (NUTS)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">green</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">var</span><span class="x">(</span><span class="n">x</span><span class="x">)],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (data)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">black</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">])],</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span><span class="s">""</span><span class="x">)</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">histogram</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="x">,</span> <span class="n">normed</span><span class="o">=</span><span class="nb">true</span><span class="x">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (ADVI)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples_nuts</span><span class="x">,</span> <span class="o">:</span><span class="n">m</span><span class="x">;</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (NUTS)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">green</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">)],</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">black</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (data)"</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">])],</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span><span class="o">=</span><span class="s">""</span><span class="x">)</span>
+
+<span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">,</span> <span class="n">layout</span><span class="o">=</span><span class="x">(</span><span class="mi">2</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">size</span><span class="o">=</span><span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">))</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_18_1.png" alt="" /></p>
+<p>For this particular <code>Model</code>, we can in fact obtain the posterior of the latent variables in closed form. This allows us to compare both <code>NUTS</code> and <code>ADVI</code> to the true posterior $p(s, m \mid {x_i}_{i = 1}^n )$.</p>
+<p><em>The code below is just work to get the marginals $p(s \mid {x_i}<em>{i = 1}^n)$ and $p(m \mid {x_i}</em>{i = 1}^n)$ from the posterior obtained using ConjugatePriors.jl. Feel free to skip it.</em></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># used to compute closed form expression of posterior</span>
+<span class="k">using</span> <span class="n">ConjugatePriors</span>
+
+<span class="c"># closed form computation</span>
+<span class="c"># notation mapping has been verified by explicitly computing expressions</span>
+<span class="c"># in "Conjugate Bayesian analysis of the Gaussian distribution" by Murphy</span>
+<span class="n">μ₀</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c"># =&gt; μ</span>
+<span class="n">κ₀</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c"># =&gt; ν, which scales the precision of the Normal</span>
+<span class="n">α₀</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="c"># =&gt; "shape"</span>
+<span class="n">β₀</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="c"># =&gt; "rate", which is 1 / θ, where θ is "scale"</span>
+
+<span class="c"># prior</span>
+<span class="n">pri</span> <span class="o">=</span> <span class="n">NormalGamma</span><span class="x">(</span><span class="n">μ₀</span><span class="x">,</span> <span class="n">κ₀</span><span class="x">,</span> <span class="n">α₀</span><span class="x">,</span> <span class="n">β₀</span><span class="x">)</span>
+
+<span class="c"># posterior</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">posterior</span><span class="x">(</span><span class="n">pri</span><span class="x">,</span> <span class="n">Normal</span><span class="x">,</span> <span class="n">x</span><span class="x">)</span>
+
+<span class="c"># marginal distribution of τ = 1 / σ²</span>
+<span class="c"># Eq. (90) in "Conjugate Bayesian analysis of the Gaussian distribution" by Murphy</span>
+<span class="c"># `scale(post)` = θ</span>
+<span class="n">p_τ</span> <span class="o">=</span> <span class="n">Gamma</span><span class="x">(</span><span class="n">post</span><span class="o">.</span><span class="n">shape</span><span class="x">,</span> <span class="n">scale</span><span class="x">(</span><span class="n">post</span><span class="x">))</span>
+<span class="n">p_σ²_pdf</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-&gt;</span> <span class="n">pdf</span><span class="x">(</span><span class="n">p_τ</span><span class="x">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">z</span><span class="x">)</span> <span class="c"># τ =&gt; 1 / σ² </span>
+
+<span class="c"># marginal of μ</span>
+<span class="c"># Eq. (91) in "Conjugate Bayesian analysis of the Gaussian distribution" by Murphy</span>
+<span class="n">p_μ</span> <span class="o">=</span> <span class="n">TDist</span><span class="x">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">post</span><span class="o">.</span><span class="n">shape</span><span class="x">)</span>
+
+<span class="n">μₙ</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">mu</span>    <span class="c"># μ → μ</span>
+<span class="n">κₙ</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">nu</span>    <span class="c"># κ → ν</span>
+<span class="n">αₙ</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">shape</span> <span class="c"># α → shape</span>
+<span class="n">βₙ</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">rate</span>  <span class="c"># β → rate</span>
+
+<span class="c"># numerically more stable but doesn't seem to have effect; issue is probably internal to</span>
+<span class="c"># `pdf` which needs to compute ≈ Γ(1000) </span>
+<span class="n">p_μ_pdf</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-&gt;</span> <span class="n">exp</span><span class="x">(</span><span class="n">logpdf</span><span class="x">(</span><span class="n">p_μ</span><span class="x">,</span> <span class="x">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">μₙ</span><span class="x">)</span> <span class="o">*</span> <span class="n">exp</span><span class="x">(</span><span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">log</span><span class="x">(</span><span class="n">βₙ</span><span class="x">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">log</span><span class="x">(</span><span class="n">αₙ</span><span class="x">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">log</span><span class="x">(</span><span class="n">κₙ</span><span class="x">))))</span>
+
+<span class="c"># posterior plots</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">plot</span><span class="x">();</span>
+<span class="n">histogram!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="x">,</span> <span class="n">normed</span><span class="o">=</span><span class="nb">true</span><span class="x">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (ADVI)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples_nuts</span><span class="x">,</span> <span class="o">:</span><span class="n">s</span><span class="x">;</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (NUTS)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">green</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">1</span><span class="x">,</span> <span class="o">:</span><span class="x">])],</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mf">1.5</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span><span class="s">""</span><span class="x">)</span>
+
+<span class="c"># normalize using Riemann approx. because of (almost certainly) numerical issues</span>
+<span class="n">Δ</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mf">0.75</span><span class="o">:</span><span class="mf">0.001</span><span class="o">:</span><span class="mf">1.50</span>
+<span class="n">norm_const</span> <span class="o">=</span> <span class="n">sum</span><span class="x">(</span><span class="n">p_σ²_pdf</span><span class="o">.</span><span class="x">(</span><span class="n">r</span><span class="x">)</span> <span class="o">.*</span> <span class="n">Δ</span><span class="x">)</span>
+<span class="n">plot!</span><span class="x">(</span><span class="n">r</span><span class="x">,</span> <span class="n">p_σ²_pdf</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (posterior)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">red</span><span class="x">);</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">var</span><span class="x">(</span><span class="n">x</span><span class="x">)],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"s (data)"</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mf">1.5</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">black</span><span class="x">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.7</span><span class="x">);</span>
+<span class="n">xlims!</span><span class="x">(</span><span class="mf">0.75</span><span class="x">,</span> <span class="mf">1.35</span><span class="x">);</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">plot</span><span class="x">();</span>
+<span class="n">histogram!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="x">,</span> <span class="n">normed</span><span class="o">=</span><span class="nb">true</span><span class="x">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (ADVI)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">)</span>
+<span class="n">density!</span><span class="x">(</span><span class="n">samples_nuts</span><span class="x">,</span> <span class="o">:</span><span class="n">m</span><span class="x">;</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (NUTS)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">green</span><span class="x">)</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="mi">2</span><span class="x">,</span> <span class="o">:</span><span class="x">])],</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mf">1.5</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">blue</span><span class="x">,</span> <span class="n">label</span><span class="o">=</span><span class="s">""</span><span class="x">)</span>
+
+
+<span class="c"># normalize using Riemann approx. because of (almost certainly) numerical issues</span>
+<span class="n">Δ</span> <span class="o">=</span> <span class="mf">0.0001</span>
+<span class="n">r</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1</span> <span class="o">+</span> <span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">)</span><span class="o">:</span><span class="n">Δ</span><span class="o">:</span><span class="mf">0.1</span> <span class="o">+</span> <span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">)</span>
+<span class="n">norm_const</span> <span class="o">=</span> <span class="n">sum</span><span class="x">(</span><span class="n">p_μ_pdf</span><span class="o">.</span><span class="x">(</span><span class="n">r</span><span class="x">)</span> <span class="o">.*</span> <span class="n">Δ</span><span class="x">)</span>
+<span class="n">plot!</span><span class="x">(</span><span class="n">r</span><span class="x">,</span> <span class="n">z</span> <span class="o">-&gt;</span> <span class="n">p_μ_pdf</span><span class="x">(</span><span class="n">z</span><span class="x">)</span> <span class="o">/</span> <span class="n">norm_const</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (posterior)"</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">red</span><span class="x">);</span>
+<span class="n">vline!</span><span class="x">([</span><span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">)],</span> <span class="n">label</span> <span class="o">=</span> <span class="s">"m (data)"</span><span class="x">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mf">1.5</span><span class="x">,</span> <span class="n">color</span> <span class="o">=</span> <span class="o">:</span><span class="n">black</span><span class="x">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.7</span><span class="x">);</span>
+
+<span class="n">xlims!</span><span class="x">(</span><span class="o">-</span><span class="mf">0.25</span><span class="x">,</span> <span class="mf">0.25</span><span class="x">);</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">;</span> <span class="n">layout</span><span class="o">=</span><span class="x">(</span><span class="mi">2</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">size</span><span class="o">=</span><span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">))</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_19_1.png" alt="" /></p>
+<h1 id="bayesian-linear-regression-example-using-codeadvicode">Bayesian linear regression example using <code>ADVI</code></h1>
+<p>This is simply a duplication of the tutorial <a href="../regression/02_linear-regression">5. Linear regression</a> but now with the addition of an approximate posterior obtained using <code>ADVI</code>.</p>
+<p>As we'll see, there is really no additional work required to apply variational inference to a more complex <code>Model</code>.</p>
+<h2 id="copy-paste-from-a-hrefregression02linear-regression5-linear-regressiona">Copy-paste from <a href="../regression/02_linear-regression">5. Linear regression</a></h2>
+<p>This section is basically copy-pasting the code from the <a href="../regression/02_linear-regression">linear regression tutorial</a>.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="x">(</span><span class="mi">1</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Import RDatasets.</span>
+<span class="k">using</span> <span class="n">RDatasets</span>
+
+<span class="c"># Hide the progress prompt while sampling.</span>
+<span class="n">Turing</span><span class="o">.</span><span class="n">setprogress!</span><span class="x">(</span><span class="nb">false</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Import the "Default" dataset.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">RDatasets</span><span class="o">.</span><span class="n">dataset</span><span class="x">(</span><span class="s">"datasets"</span><span class="x">,</span> <span class="s">"mtcars"</span><span class="x">);</span>
+
+<span class="c"># Show the first six rows of the dataset.</span>
+<span class="n">first</span><span class="x">(</span><span class="n">data</span><span class="x">,</span> <span class="mi">6</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>6×12 DataFrame. Omitted printing of 6 columns
+│ Row │ Model             │ MPG     │ Cyl   │ Disp    │ HP    │ DRat    │
+│     │ String            │ Float64 │ Int64 │ Float64 │ Int64 │ Float64 │
+├─────┼───────────────────┼─────────┼───────┼─────────┼───────┼─────────┤
+│ 1   │ Mazda RX4         │ 21.0    │ 6     │ 160.0   │ 110   │ 3.9     │
+│ 2   │ Mazda RX4 Wag     │ 21.0    │ 6     │ 160.0   │ 110   │ 3.9     │
+│ 3   │ Datsun 710        │ 22.8    │ 4     │ 108.0   │ 93    │ 3.85    │
+│ 4   │ Hornet 4 Drive    │ 21.4    │ 6     │ 258.0   │ 110   │ 3.08    │
+│ 5   │ Hornet Sportabout │ 18.7    │ 8     │ 360.0   │ 175   │ 3.15    │
+│ 6   │ Valiant           │ 18.1    │ 6     │ 225.0   │ 105   │ 2.76    │
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Function to split samples.</span>
+<span class="k">function</span><span class="nf"> split_data</span><span class="x">(</span><span class="n">df</span><span class="x">,</span> <span class="n">at</span> <span class="o">=</span> <span class="mf">0.70</span><span class="x">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">size</span><span class="x">(</span><span class="n">df</span><span class="x">,</span><span class="mi">1</span><span class="x">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="kt">Int</span><span class="x">(</span><span class="n">round</span><span class="x">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">at</span><span class="x">))</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">df</span><span class="x">[</span><span class="mi">1</span><span class="o">:</span><span class="n">index</span><span class="x">,</span> <span class="o">:</span><span class="x">]</span>
+    <span class="n">test</span>  <span class="o">=</span> <span class="n">df</span><span class="x">[(</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="x">)</span><span class="o">:</span><span class="k">end</span><span class="x">,</span> <span class="o">:</span><span class="x">]</span>
+    <span class="k">return</span> <span class="n">train</span><span class="x">,</span> <span class="n">test</span>
+<span class="k">end</span>
+
+<span class="c"># A handy helper function to rescale our dataset.</span>
+<span class="k">function</span><span class="nf"> standardize</span><span class="x">(</span><span class="n">x</span><span class="x">)</span>
+    <span class="k">return</span> <span class="x">(</span><span class="n">x</span> <span class="o">.-</span> <span class="n">mean</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">))</span> <span class="o">./</span> <span class="n">std</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">),</span> <span class="n">x</span>
+<span class="k">end</span>
+
+<span class="c"># Another helper function to unstandardize our datasets.</span>
+<span class="k">function</span><span class="nf"> unstandardize</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="n">orig</span><span class="x">)</span>
+    <span class="k">return</span> <span class="x">(</span><span class="n">x</span> <span class="o">.+</span> <span class="n">mean</span><span class="x">(</span><span class="n">orig</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">))</span> <span class="o">.*</span> <span class="n">std</span><span class="x">(</span><span class="n">orig</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>unstandardize (generic function with 1 method)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Remove the model column.</span>
+<span class="n">select!</span><span class="x">(</span><span class="n">data</span><span class="x">,</span> <span class="n">Not</span><span class="x">(</span><span class="o">:</span><span class="n">Model</span><span class="x">))</span>
+
+<span class="c"># Standardize our dataset.</span>
+<span class="x">(</span><span class="n">std_data</span><span class="x">,</span> <span class="n">data_arr</span><span class="x">)</span> <span class="o">=</span> <span class="n">standardize</span><span class="x">(</span><span class="kt">Matrix</span><span class="x">(</span><span class="n">data</span><span class="x">))</span>
+
+<span class="c"># Split our dataset 70%/30% into training/test sets.</span>
+<span class="n">train</span><span class="x">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">split_data</span><span class="x">(</span><span class="n">std_data</span><span class="x">,</span> <span class="mf">0.7</span><span class="x">)</span>
+
+<span class="c"># Save dataframe versions of our dataset.</span>
+<span class="n">train_cut</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="x">(</span><span class="n">train</span><span class="x">,</span> <span class="n">names</span><span class="x">(</span><span class="n">data</span><span class="x">))</span>
+<span class="n">test_cut</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="n">names</span><span class="x">(</span><span class="n">data</span><span class="x">))</span>
+
+<span class="c"># Create our labels. These are the values we are trying to predict.</span>
+<span class="n">train_label</span> <span class="o">=</span> <span class="n">train_cut</span><span class="x">[</span><span class="o">:</span><span class="x">,</span> <span class="o">:</span><span class="n">MPG</span><span class="x">]</span>
+<span class="n">test_label</span> <span class="o">=</span> <span class="n">test_cut</span><span class="x">[</span><span class="o">:</span><span class="x">,</span> <span class="o">:</span><span class="n">MPG</span><span class="x">]</span>
+
+<span class="c"># Get the list of columns to keep.</span>
+<span class="n">remove_names</span> <span class="o">=</span> <span class="n">filter</span><span class="x">(</span><span class="n">x</span><span class="o">-&gt;!</span><span class="k">in</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="x">[</span><span class="o">:</span><span class="n">MPG</span><span class="x">,</span> <span class="o">:</span><span class="n">Model</span><span class="x">]),</span> <span class="n">names</span><span class="x">(</span><span class="n">data</span><span class="x">))</span>
+
+<span class="c"># Filter the test and train sets.</span>
+<span class="n">train</span> <span class="o">=</span> <span class="kt">Matrix</span><span class="x">(</span><span class="n">train_cut</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="n">remove_names</span><span class="x">]);</span>
+<span class="n">test</span> <span class="o">=</span> <span class="kt">Matrix</span><span class="x">(</span><span class="n">test_cut</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="n">remove_names</span><span class="x">]);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Bayesian linear regression.</span>
+<span class="nd">@model</span> <span class="n">linear_regression</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="n">y</span><span class="x">,</span> <span class="n">n_obs</span><span class="x">,</span> <span class="n">n_vars</span><span class="x">,</span> <span class="o">::</span><span class="kt">Type</span><span class="x">{</span><span class="n">T</span><span class="x">}</span><span class="o">=</span><span class="kt">Vector</span><span class="x">{</span><span class="kt">Float64</span><span class="x">})</span> <span class="k">where</span> <span class="x">{</span><span class="n">T</span><span class="x">}</span> <span class="o">=</span> <span class="k">begin</span>
+    <span class="c"># Set variance prior.</span>
+    <span class="n">σ₂</span> <span class="o">~</span> <span class="n">truncated</span><span class="x">(</span><span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span><span class="mi">100</span><span class="x">),</span> <span class="mi">0</span><span class="x">,</span> <span class="nb">Inf</span><span class="x">)</span>
+    
+    <span class="c"># Set intercept prior.</span>
+    <span class="n">intercept</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span> <span class="mi">3</span><span class="x">)</span>
+    
+    <span class="c"># Set the priors on our coefficients.</span>
+    <span class="n">coefficients</span> <span class="o">~</span> <span class="n">MvNormal</span><span class="x">(</span><span class="n">zeros</span><span class="x">(</span><span class="n">n_vars</span><span class="x">),</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">ones</span><span class="x">(</span><span class="n">n_vars</span><span class="x">))</span>
+    
+    <span class="c"># Calculate all the mu terms.</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">.+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">coefficients</span>
+    <span class="n">y</span> <span class="o">~</span> <span class="n">MvNormal</span><span class="x">(</span><span class="n">mu</span><span class="x">,</span> <span class="n">σ₂</span><span class="x">)</span>
+<span class="k">end</span><span class="x">;</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_obs</span><span class="x">,</span> <span class="n">n_vars</span> <span class="o">=</span> <span class="n">size</span><span class="x">(</span><span class="n">train</span><span class="x">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="x">(</span><span class="n">train</span><span class="x">,</span> <span class="n">train_label</span><span class="x">,</span> <span class="n">n_obs</span><span class="x">,</span> <span class="n">n_vars</span><span class="x">);</span>
+</code></pre></div></div>
+<h2 id="performing-vi">Performing VI</h2>
+<p>First we define the initial variational distribution, or, equivalently, the family of distributions to consider. We're going to use the same mean-field approximation as Turing will use by default when we call <code>vi(m, advi)</code>, which we obtain by calling <code>Variational.meanfield</code>. This returns a <code>TransformedDistribution</code> with a <code>TuringDiagMvNormal</code> as the underlying distribution and the transformation mapping from the reals to the domain of the latent variables.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q0</span> <span class="o">=</span> <span class="n">Variational</span><span class="o">.</span><span class="n">meanfield</span><span class="x">(</span><span class="n">m</span><span class="x">)</span>
+<span class="n">typeof</span><span class="x">(</span><span class="n">q0</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>Bijectors.TransformedDistribution{DistributionsAD.TuringDiagMvNormal{Array{
+Float64,1},Array{Float64,1}},Bijectors.Stacked{Tuple{Bijectors.Inverse{Bije
+ctors.TruncatedBijector{0,Float64,Float64},0},Bijectors.Identity{0},Bijecto
+rs.Identity{1}},3},Distributions.Multivariate}
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">advi</span> <span class="o">=</span> <span class="n">ADVI</span><span class="x">(</span><span class="mi">10</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>AdvancedVI.ADVI{AdvancedVI.ForwardDiffAD{40}}(10, 10000)
+</code></pre>
+<p>Turing also provides a couple of different optimizers:</p>
+<ul>
+<li><code>TruncatedADAGrad</code> (default)</li>
+<li><code>DecayedADAGrad</code>
+as these are well-suited for problems with high-variance stochastic objectives, which is usually what the ELBO ends up being at different times in our optimization process.</li>
+</ul>
+<p>With that being said, thanks to Requires.jl, if we add a <code>using Flux</code> prior to <code>using Turing</code> we can also make use of all the optimizers in <code>Flux</code>, e.g. <code>ADAM</code>, without any additional changes to your code! For example:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">Flux</span><span class="x">,</span> <span class="n">Turing</span>
+<span class="k">using</span> <span class="n">Turing</span><span class="o">.</span><span class="n">Variational</span>
+
+<span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">advi</span><span class="x">;</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="n">ADAM</span><span class="x">())</span>
+</code></pre></div></div>
+<p>just works.</p>
+<p>For this problem we'll use the <code>DecayedADAGrad</code> from Turing:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">opt</span> <span class="o">=</span> <span class="n">Variational</span><span class="o">.</span><span class="n">DecayedADAGrad</span><span class="x">(</span><span class="mf">1e-2</span><span class="x">,</span> <span class="mf">1.1</span><span class="x">,</span> <span class="mf">0.9</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>AdvancedVI.DecayedADAGrad(0.01, 1.1, 0.9, IdDict{Any,Any}())
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q</span> <span class="o">=</span> <span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">advi</span><span class="x">,</span> <span class="n">q0</span><span class="x">;</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">opt</span><span class="x">)</span>
+<span class="n">typeof</span><span class="x">(</span><span class="n">q</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>Bijectors.TransformedDistribution{DistributionsAD.TuringDiagMvNormal{Array{
+Float64,1},Array{Float64,1}},Bijectors.Stacked{Tuple{Bijectors.Inverse{Bije
+ctors.TruncatedBijector{0,Float64,Float64},0},Bijectors.Identity{0},Bijecto
+rs.Identity{1}},3},Distributions.Multivariate}
+</code></pre>
+<p><em>Note: as mentioned before, we internally define a <code>update(q::TransformedDistribution{&lt;:TuringDiagMvNormal}, θ::AbstractVector)</code> method which takes in the current variational approximation <code>q</code> together with new parameters <code>z</code> and returns the new variational approximation. This is required so that we can actually update the <code>Distribution</code> object after each optimization step.</em></p>
+<p><em>Alternatively, we can instead provide the mapping $\theta \mapsto q_{\theta}$ directly together with initial parameters using the signature <code>vi(m, advi, getq, θ_init)</code> as mentioned earlier. We'll see an explicit example of this later on!</em></p>
+<p>To compute statistics for our approximation we need samples:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">);</span>
+</code></pre></div></div>
+<p>Now we can for example look at the average</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg</span> <span class="o">=</span> <span class="n">vec</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">z</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">))</span>
+</code></pre></div></div>
+<pre><code>13-element Array{Float64,1}:
+  0.020117192340218665
+  0.0002796669830116502
+  1.0010658079947254
+ -0.00027613100477009924
+  0.0019703203129575017
+  0.0011012413001283284
+ -0.002683222755889248
+ -0.0017262666130412618
+ -0.0010564941529113507
+ -8.207373094640307e-5
+  5.198685294519674e-5
+  5.285097329590308e-5
+  0.0031336481988493855
+</code></pre>
+<p>The vector has the same ordering as the model, e.g. in this case <code>σ₂</code> has index <code>1</code>, <code>intercept</code> has index <code>2</code> and <code>coefficients</code> has indices <code>3:12</code>. If  you forget or you might want to do something programmatically with the result, you can obtain the <code>sym → indices</code> mapping as follows:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">_</span><span class="x">,</span> <span class="n">sym2range</span> <span class="o">=</span> <span class="n">bijector</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="kt">Val</span><span class="x">(</span><span class="nb">true</span><span class="x">));</span>
+<span class="n">sym2range</span>
+</code></pre></div></div>
+<pre><code>(intercept = UnitRange{Int64}[2:2], σ₂ = UnitRange{Int64}[1:1], coefficient
+s = UnitRange{Int64}[3:13])
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">σ₂</span><span class="x">]</span><span class="o">...</span><span class="x">)]</span>
+</code></pre></div></div>
+<pre><code>1-element Array{Float64,1}:
+ 0.020117192340218665
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">intercept</span><span class="x">]</span><span class="o">...</span><span class="x">)]</span>
+</code></pre></div></div>
+<pre><code>1-element Array{Float64,1}:
+ 0.0002796669830116502
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">coefficients</span><span class="x">]</span><span class="o">...</span><span class="x">)]</span>
+</code></pre></div></div>
+<pre><code>11-element Array{Float64,1}:
+  1.0010658079947254
+ -0.00027613100477009924
+  0.0019703203129575017
+  0.0011012413001283284
+ -0.002683222755889248
+ -0.0017262666130412618
+ -0.0010564941529113507
+ -8.207373094640307e-5
+  5.198685294519674e-5
+  5.285097329590308e-5
+  0.0031336481988493855
+</code></pre>
+<p><em>Note: as you can see, this is slightly awkward to work with at the moment. We'll soon add a better way of dealing with this.</em></p>
+<p>With a bit of work (this will be much easier in the future), we can also visualize the approximate marginals of the different variables, similar to <code>plot(chain)</code>:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span><span class="nf"> plot_variational_marginals</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">)</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="x">[]</span>
+
+    <span class="k">for</span> <span class="x">(</span><span class="n">i</span><span class="x">,</span> <span class="n">sym</span><span class="x">)</span> <span class="k">in</span> <span class="n">enumerate</span><span class="x">(</span><span class="n">keys</span><span class="x">(</span><span class="n">sym2range</span><span class="x">))</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="n">sym</span><span class="x">]</span><span class="o">...</span><span class="x">)</span>  <span class="c"># &lt;= array of ranges</span>
+        <span class="k">if</span> <span class="n">sum</span><span class="x">(</span><span class="n">length</span><span class="o">.</span><span class="x">(</span><span class="n">indices</span><span class="x">))</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="k">in</span> <span class="n">indices</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="k">in</span> <span class="n">r</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">density</span><span class="x">(</span><span class="n">z</span><span class="x">[</span><span class="n">j</span><span class="x">,</span> <span class="o">:</span><span class="x">],</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"</span><span class="si">$(sym)</span><span class="s">[</span><span class="si">$</span><span class="s">offset]"</span><span class="x">,</span> <span class="n">titlefontsize</span> <span class="o">=</span> <span class="mi">10</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+                    <span class="n">push!</span><span class="x">(</span><span class="n">ps</span><span class="x">,</span> <span class="n">p</span><span class="x">)</span>
+
+                    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">end</span>
+            <span class="k">end</span>
+        <span class="k">else</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">density</span><span class="x">(</span><span class="n">z</span><span class="x">[</span><span class="n">first</span><span class="x">(</span><span class="n">indices</span><span class="x">),</span> <span class="o">:</span><span class="x">],</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"</span><span class="si">$(sym)</span><span class="s">"</span><span class="x">,</span> <span class="n">titlefontsize</span> <span class="o">=</span> <span class="mi">10</span><span class="x">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">""</span><span class="x">)</span>
+            <span class="n">push!</span><span class="x">(</span><span class="n">ps</span><span class="x">,</span> <span class="n">p</span><span class="x">)</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+    
+    <span class="k">return</span> <span class="n">plot</span><span class="x">(</span><span class="n">ps</span><span class="o">...</span><span class="x">,</span> <span class="n">layout</span> <span class="o">=</span> <span class="x">(</span><span class="n">length</span><span class="x">(</span><span class="n">ps</span><span class="x">),</span> <span class="mi">1</span><span class="x">),</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">500</span><span class="x">,</span> <span class="mi">1500</span><span class="x">))</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>plot_variational_marginals (generic function with 1 method)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot_variational_marginals</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_39_1.png" alt="" /></p>
+<p>And let's compare this to using the <code>NUTS</code> sampler:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">chain</span> <span class="o">=</span> <span class="n">sample</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">NUTS</span><span class="x">(</span><span class="mf">0.65</span><span class="x">),</span> <span class="mi">10_000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_41_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vi_mean</span> <span class="o">=</span> <span class="n">vec</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">z</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">))[[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">coefficients</span><span class="x">]</span><span class="o">...</span><span class="x">)</span><span class="o">...</span><span class="x">,</span> <span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">intercept</span><span class="x">]</span><span class="o">...</span><span class="x">)</span><span class="o">...</span><span class="x">,</span> <span class="n">union</span><span class="x">(</span><span class="n">sym2range</span><span class="x">[</span><span class="o">:</span><span class="n">σ₂</span><span class="x">]</span><span class="o">...</span><span class="x">)</span><span class="o">...</span><span class="x">]]</span>
+</code></pre></div></div>
+<pre><code>13-element Array{Float64,1}:
+  1.0010658079947254
+ -0.00027613100477009924
+  0.0019703203129575017
+  0.0011012413001283284
+ -0.002683222755889248
+ -0.0017262666130412618
+ -0.0010564941529113507
+ -8.207373094640307e-5
+  5.198685294519674e-5
+  5.285097329590308e-5
+  0.0031336481988493855
+  0.0002796669830116502
+  0.020117192340218665
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mean</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span><span class="o">.</span><span class="n">nt</span><span class="o">.</span><span class="n">mean</span>
+</code></pre></div></div>
+<pre><code>13-element Array{Float64,1}:
+  1.0000000399377265
+ -3.418828635857032e-8
+  2.4761590570486984e-9
+  1.8477962723990843e-8
+ -4.0801944678703214e-8
+  3.6899324841451007e-9
+  6.991847816704769e-10
+  8.432730884578574e-9
+  1.72177428312298e-8
+ -3.3881239715188653e-8
+  4.439930725536783e-8
+ -6.963225118208367e-10
+  1.9275537805998484e-6
+</code></pre>
+<p>One thing we can look at is simply the squared error between the means:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sum</span><span class="x">(</span><span class="n">abs2</span><span class="x">,</span> <span class="n">mean</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span><span class="o">.</span><span class="n">nt</span><span class="o">.</span><span class="n">mean</span> <span class="o">.-</span> <span class="n">vi_mean</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>0.0004321363903591653
+</code></pre>
+<p>That looks pretty good! But let's see how the predictive distributions looks for the two.</p>
+<h2 id="prediction">Prediction</h2>
+<p>Similarily to the linear regression tutorial, we're going to compare to multivariate ordinary linear regression using the <code>GLM</code> package:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Import the GLM package.</span>
+<span class="k">using</span> <span class="n">GLM</span>
+
+<span class="c"># Perform multivariate OLS.</span>
+<span class="n">ols</span> <span class="o">=</span> <span class="n">lm</span><span class="x">(</span><span class="nd">@formula</span><span class="x">(</span><span class="n">MPG</span> <span class="o">~</span> <span class="n">Cyl</span> <span class="o">+</span> <span class="n">Disp</span> <span class="o">+</span> <span class="n">HP</span> <span class="o">+</span> <span class="n">DRat</span> <span class="o">+</span> <span class="n">WT</span> <span class="o">+</span> <span class="n">QSec</span> <span class="o">+</span> <span class="n">VS</span> <span class="o">+</span> <span class="n">AM</span> <span class="o">+</span> <span class="n">Gear</span> <span class="o">+</span> <span class="n">Carb</span><span class="x">),</span> <span class="n">train_cut</span><span class="x">)</span>
+
+<span class="c"># Store our predictions in the original dataframe.</span>
+<span class="n">train_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">GLM</span><span class="o">.</span><span class="n">predict</span><span class="x">(</span><span class="n">ols</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+<span class="n">test_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">GLM</span><span class="o">.</span><span class="n">predict</span><span class="x">(</span><span class="n">ols</span><span class="x">,</span> <span class="n">test_cut</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Make a prediction given an input vector.</span>
+<span class="k">function</span><span class="nf"> prediction_chain</span><span class="x">(</span><span class="n">chain</span><span class="x">,</span> <span class="n">x</span><span class="x">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">get_params</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span>
+    <span class="n">α</span> <span class="o">=</span> <span class="n">mean</span><span class="x">(</span><span class="n">p</span><span class="o">.</span><span class="n">intercept</span><span class="x">)</span>
+    <span class="n">β</span> <span class="o">=</span> <span class="n">collect</span><span class="x">(</span><span class="n">mean</span><span class="o">.</span><span class="x">(</span><span class="n">p</span><span class="o">.</span><span class="n">coefficients</span><span class="x">))</span>
+    <span class="k">return</span>  <span class="n">α</span> <span class="o">.+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">β</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>prediction_chain (generic function with 1 method)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Make a prediction using samples from the variational posterior given an input vector.</span>
+<span class="k">function</span><span class="nf"> prediction</span><span class="x">(</span><span class="n">samples</span><span class="o">::</span><span class="kt">AbstractVector</span><span class="x">,</span> <span class="n">sym2ranges</span><span class="x">,</span> <span class="n">x</span><span class="x">)</span>
+    <span class="n">α</span> <span class="o">=</span> <span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2ranges</span><span class="x">[</span><span class="o">:</span><span class="n">intercept</span><span class="x">]</span><span class="o">...</span><span class="x">)])</span>
+    <span class="n">β</span> <span class="o">=</span> <span class="n">vec</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2ranges</span><span class="x">[</span><span class="o">:</span><span class="n">coefficients</span><span class="x">]</span><span class="o">...</span><span class="x">)];</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">))</span>
+    <span class="k">return</span>  <span class="n">α</span> <span class="o">.+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">β</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="nf"> prediction</span><span class="x">(</span><span class="n">samples</span><span class="o">::</span><span class="kt">AbstractMatrix</span><span class="x">,</span> <span class="n">sym2ranges</span><span class="x">,</span> <span class="n">x</span><span class="x">)</span>
+    <span class="n">α</span> <span class="o">=</span> <span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2ranges</span><span class="x">[</span><span class="o">:</span><span class="n">intercept</span><span class="x">]</span><span class="o">...</span><span class="x">),</span> <span class="o">:</span><span class="x">])</span>
+    <span class="n">β</span> <span class="o">=</span> <span class="n">vec</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">samples</span><span class="x">[</span><span class="n">union</span><span class="x">(</span><span class="n">sym2ranges</span><span class="x">[</span><span class="o">:</span><span class="n">coefficients</span><span class="x">]</span><span class="o">...</span><span class="x">),</span> <span class="o">:</span><span class="x">];</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">))</span>
+    <span class="k">return</span>  <span class="n">α</span> <span class="o">.+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">β</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>prediction (generic function with 2 methods)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Unstandardize the dependent variable.</span>
+<span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+<span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Show the first side rows of the modified dataframe.</span>
+<span class="n">first</span><span class="x">(</span><span class="n">test_cut</span><span class="x">,</span> <span class="mi">6</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>6×12 DataFrame. Omitted printing of 6 columns
+│ Row │ MPG     │ Cyl      │ Disp      │ HP        │ DRat      │ WT       │
+│     │ Float64 │ Float64  │ Float64   │ Float64   │ Float64   │ Float64  │
+├─────┼─────────┼──────────┼───────────┼───────────┼───────────┼──────────┤
+│ 1   │ 116.195 │ 1.01488  │ 0.591245  │ 0.0483133 │ -0.835198 │ 0.222544 │
+│ 2   │ 114.295 │ 1.01488  │ 0.962396  │ 1.4339    │ 0.249566  │ 0.636461 │
+│ 3   │ 120.195 │ 1.01488  │ 1.36582   │ 0.412942  │ -0.966118 │ 0.641571 │
+│ 4   │ 128.295 │ -1.22486 │ -1.22417  │ -1.17684  │ 0.904164  │ -1.31048 │
+│ 5   │ 126.995 │ -1.22486 │ -0.890939 │ -0.812211 │ 1.55876   │ -1.10097 │
+│ 6   │ 131.395 │ -1.22486 │ -1.09427  │ -0.491337 │ 0.324377  │ -1.74177 │
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Calculate the predictions for the training and testing sets using the samples `z` from variational posterior</span>
+<span class="n">train_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">train</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+<span class="n">test_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+
+<span class="n">train_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction_chain</span><span class="x">(</span><span class="n">chain</span><span class="x">,</span> <span class="n">train</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+<span class="n">test_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction_chain</span><span class="x">(</span><span class="n">chain</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vi_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">bayes_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">ols_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+
+<span class="n">vi_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">bayes_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">ols_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+
+<span class="n">println</span><span class="x">(</span><span class="s">"Training set:
+    VI loss: </span><span class="si">$</span><span class="s">vi_loss1
+    Bayes loss: </span><span class="si">$</span><span class="s">bayes_loss1
+    OLS loss: </span><span class="si">$</span><span class="s">ols_loss1
+Test set: 
+    VI loss: </span><span class="si">$</span><span class="s">vi_loss2
+    Bayes loss: </span><span class="si">$</span><span class="s">bayes_loss2
+    OLS loss: </span><span class="si">$</span><span class="s">ols_loss2"</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>Training set:
+    VI loss: 0.0007001199110320346
+    Bayes loss: 1.3743352743877082e-14
+    OLS loss: 3.070926124893025
+Test set: 
+    VI loss: 0.0014915402827578768
+    Bayes loss: 9.410239119029718e-14
+    OLS loss: 27.094813070760445
+</code></pre>
+<p>Interestingly the squared difference between true- and mean-prediction on the test-set is actually <em>better</em> for the mean-field variational posterior than for the &quot;true&quot; posterior obtained by MCMC sampling using <code>NUTS</code>. But, as Bayesians, we know that the mean doesn't tell the entire story. One quick check is to look at the mean predictions ± standard deviation of the two different approaches:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">1000</span><span class="x">);</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">hcat</span><span class="x">([</span><span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">[</span><span class="o">:</span><span class="x">,</span> <span class="n">i</span><span class="x">],</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span> <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="mi">2</span><span class="x">)]</span><span class="o">...</span><span class="x">);</span>
+
+<span class="n">scatter</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"prediction (mean ± std)"</span><span class="x">,</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">),</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="x">)</span>
+<span class="n">scatter!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_label</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"true"</span><span class="x">)</span>
+<span class="n">xaxis!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">))</span>
+<span class="n">ylims!</span><span class="x">(</span><span class="mi">95</span><span class="x">,</span> <span class="mi">140</span><span class="x">)</span>
+<span class="n">title!</span><span class="x">(</span><span class="s">"Mean-field ADVI (Normal)"</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_53_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">preds</span> <span class="o">=</span> <span class="n">hcat</span><span class="x">([</span><span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction_chain</span><span class="x">(</span><span class="n">chain</span><span class="x">[</span><span class="n">i</span><span class="x">],</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span> <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="mi">5</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">chain</span><span class="x">,</span> <span class="mi">1</span><span class="x">)]</span><span class="o">...</span><span class="x">);</span>
+
+<span class="n">scatter</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"prediction (mean ± std)"</span><span class="x">,</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">),</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="x">)</span>
+<span class="n">scatter!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_label</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"true"</span><span class="x">)</span>
+<span class="n">xaxis!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">))</span>
+<span class="n">ylims!</span><span class="x">(</span><span class="mi">95</span><span class="x">,</span> <span class="mi">140</span><span class="x">)</span>
+<span class="n">title!</span><span class="x">(</span><span class="s">"MCMC (NUTS)"</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_54_1.png" alt="" /></p>
+<p>Indeed we see that the MCMC approach generally provides better uncertainty estimates than the mean-field ADVI approach! Good. So all the work we've done to make MCMC fast isn't for nothing.</p>
+<h2 id="alternative-provide-parameter-to-distribution-instead-of-codeqcode-withcodeupdatecode-implemented">Alternative: provide parameter-to-distribution instead of <code>q</code> with<code>update</code> implemented</h2>
+<p>As mentioned earlier, it's also possible to just provide the mapping $\theta \mapsto q_{\theta}$ rather than the variational family / initial variational posterior <code>q</code>, i.e. use the interface <code>vi(m, advi, getq, θ_init)</code> where <code>getq</code> is the mapping $\theta \mapsto q_{\theta}$</p>
+<p>In this section we're going to construct a mean-field approximation to the model by hand using a composition of<code>Shift</code> and <code>Scale</code> from Bijectors.jl togheter with a standard multivariate Gaussian as the base distribution.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">Bijectors</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">Bijectors</span><span class="o">:</span> <span class="n">Scale</span><span class="x">,</span> <span class="n">Shift</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d</span> <span class="o">=</span> <span class="n">length</span><span class="x">(</span><span class="n">q</span><span class="x">)</span>
+<span class="n">base_dist</span> <span class="o">=</span> <span class="n">Turing</span><span class="o">.</span><span class="n">DistributionsAD</span><span class="o">.</span><span class="n">TuringDiagMvNormal</span><span class="x">(</span><span class="n">zeros</span><span class="x">(</span><span class="n">d</span><span class="x">),</span> <span class="n">ones</span><span class="x">(</span><span class="n">d</span><span class="x">))</span>
+</code></pre></div></div>
+<pre><code>DistributionsAD.TuringDiagMvNormal{Array{Float64,1},Array{Float64,1}}(
+m: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+σ: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+)
+</code></pre>
+<p><code>bijector(model::Turing.Model)</code> is defined by Turing, and will return a <code>bijector</code> which takes you from the space of the latent variables to the real space. In this particular case, this is a mapping <code>((0, ∞) × ℝ × ℝ¹⁰) → ℝ¹²</code>. We're interested in using a normal distribution as a base-distribution and transform samples to the latent space, thus we need the inverse mapping from the reals to the latent space:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">to_constrained</span> <span class="o">=</span> <span class="n">inv</span><span class="x">(</span><span class="n">bijector</span><span class="x">(</span><span class="n">m</span><span class="x">));</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span><span class="nf"> getq</span><span class="x">(</span><span class="n">θ</span><span class="x">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">length</span><span class="x">(</span><span class="n">θ</span><span class="x">)</span> <span class="o">÷</span> <span class="mi">2</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="nd">@inbounds</span> <span class="n">θ</span><span class="x">[</span><span class="mi">1</span><span class="o">:</span><span class="n">d</span><span class="x">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nd">@inbounds</span> <span class="n">θ</span><span class="x">[</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="o">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="x">]</span>
+    
+    <span class="n">b</span> <span class="o">=</span> <span class="n">to_constrained</span> <span class="n">∘</span> <span class="n">Shift</span><span class="x">(</span><span class="n">b</span><span class="x">;</span> <span class="n">dim</span> <span class="o">=</span> <span class="kt">Val</span><span class="x">(</span><span class="mi">1</span><span class="x">))</span> <span class="n">∘</span> <span class="n">Scale</span><span class="x">(</span><span class="n">exp</span><span class="o">.</span><span class="x">(</span><span class="n">A</span><span class="x">);</span> <span class="n">dim</span> <span class="o">=</span> <span class="kt">Val</span><span class="x">(</span><span class="mi">1</span><span class="x">))</span>
+    
+    <span class="k">return</span> <span class="n">transformed</span><span class="x">(</span><span class="n">base_dist</span><span class="x">,</span> <span class="n">b</span><span class="x">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>getq (generic function with 1 method)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q_mf_normal</span> <span class="o">=</span> <span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">advi</span><span class="x">,</span> <span class="n">getq</span><span class="x">,</span> <span class="n">randn</span><span class="x">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="x">));</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p1</span> <span class="o">=</span> <span class="n">plot_variational_marginals</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">q_mf_normal</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">),</span> <span class="n">sym2range</span><span class="x">)</span> <span class="c"># MvDiagNormal + Affine transformation + to_constrained</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">plot_variational_marginals</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">q</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">),</span> <span class="n">sym2range</span><span class="x">)</span>  <span class="c"># Turing.meanfield(m)</span>
+
+<span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">,</span> <span class="n">layout</span> <span class="o">=</span> <span class="x">(</span><span class="mi">1</span><span class="x">,</span> <span class="mi">2</span><span class="x">),</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">800</span><span class="x">,</span> <span class="mi">2000</span><span class="x">))</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_61_1.png" alt="" /></p>
+<p>As expected, the fits look pretty much identical.</p>
+<p>But using this interface it becomes trivial to go beyond the mean-field assumption we made for the variational posterior, as we'll see in the next section.</p>
+<h3 id="relaxing-the-mean-field-assumption">Relaxing the mean-field assumption</h3>
+<p>Here we'll instead consider the variational family to be a full non-diagonal multivariate Gaussian. As in the previous section we'll implement this by transforming a standard multivariate Gaussian using <code>Scale</code> and <code>Shift</code>, but now <code>Scale</code> will instead be using a lower-triangular matrix (representing the Cholesky of the covariance matrix of a multivariate normal) in constrast to the diagonal matrix we used in for the mean-field approximate posterior.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">LinearAlgebra</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Using `ComponentArrays.jl` together with `UnPack.jl` makes our lives much easier.</span>
+<span class="k">using</span> <span class="n">ComponentArrays</span><span class="x">,</span> <span class="n">UnPack</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">proto_arr</span> <span class="o">=</span> <span class="n">ComponentArray</span><span class="x">(</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">zeros</span><span class="x">(</span><span class="n">d</span><span class="x">,</span> <span class="n">d</span><span class="x">),</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">zeros</span><span class="x">(</span><span class="n">d</span><span class="x">)</span>
+<span class="x">)</span>
+<span class="n">proto_axes</span> <span class="o">=</span> <span class="n">proto_arr</span> <span class="o">|&gt;</span> <span class="n">getaxes</span>
+<span class="n">num_params</span> <span class="o">=</span> <span class="n">length</span><span class="x">(</span><span class="n">proto_arr</span><span class="x">)</span>
+
+<span class="k">function</span><span class="nf"> getq</span><span class="x">(</span><span class="n">θ</span><span class="x">)</span>
+    <span class="n">L</span><span class="x">,</span> <span class="n">b</span> <span class="o">=</span> <span class="k">begin</span>
+        <span class="nd">@unpack</span> <span class="n">L</span><span class="x">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">ComponentArray</span><span class="x">(</span><span class="n">θ</span><span class="x">,</span> <span class="n">proto_axes</span><span class="x">)</span>
+        <span class="kt">LowerTriangular</span><span class="x">(</span><span class="n">L</span><span class="x">),</span> <span class="n">b</span>
+    <span class="k">end</span>
+    <span class="c"># For this to represent a covariance matrix we need to ensure that the diagonal is positive.</span>
+    <span class="c"># We can enforce this by zeroing out the diagonal and then adding back the diagonal exponentiated.</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="kt">Diagonal</span><span class="x">(</span><span class="n">diag</span><span class="x">(</span><span class="n">L</span><span class="x">))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">L</span> <span class="o">-</span> <span class="n">D</span> <span class="o">+</span> <span class="n">exp</span><span class="x">(</span><span class="n">D</span><span class="x">)</span> <span class="c"># exp for Diagonal is the same as exponentiating only the diagonal entries</span>
+    
+    <span class="n">b</span> <span class="o">=</span> <span class="n">to_constrained</span> <span class="n">∘</span> <span class="n">Shift</span><span class="x">(</span><span class="n">b</span><span class="x">;</span> <span class="n">dim</span> <span class="o">=</span> <span class="kt">Val</span><span class="x">(</span><span class="mi">1</span><span class="x">))</span> <span class="n">∘</span> <span class="n">Scale</span><span class="x">(</span><span class="n">A</span><span class="x">;</span> <span class="n">dim</span> <span class="o">=</span> <span class="kt">Val</span><span class="x">(</span><span class="mi">1</span><span class="x">))</span>
+    
+    <span class="k">return</span> <span class="n">transformed</span><span class="x">(</span><span class="n">base_dist</span><span class="x">,</span> <span class="n">b</span><span class="x">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<pre><code>getq (generic function with 1 method)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">advi</span> <span class="o">=</span> <span class="n">ADVI</span><span class="x">(</span><span class="mi">10</span><span class="x">,</span> <span class="mi">20_000</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>AdvancedVI.ADVI{AdvancedVI.ForwardDiffAD{40}}(10, 20000)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q_full_normal</span> <span class="o">=</span> <span class="n">vi</span><span class="x">(</span><span class="n">m</span><span class="x">,</span> <span class="n">advi</span><span class="x">,</span> <span class="n">getq</span><span class="x">,</span> <span class="n">randn</span><span class="x">(</span><span class="n">num_params</span><span class="x">);</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Variational</span><span class="o">.</span><span class="n">DecayedADAGrad</span><span class="x">(</span><span class="mf">1e-2</span><span class="x">));</span>
+</code></pre></div></div>
+<p>Let's have a look at the learned covariance matrix:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">A</span> <span class="o">=</span> <span class="n">q_full_normal</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">ts</span><span class="x">[</span><span class="mi">1</span><span class="x">]</span><span class="o">.</span><span class="n">a</span>
+</code></pre></div></div>
+<pre><code>13×13 LinearAlgebra.LowerTriangular{Float64,Array{Float64,2}}:
+  0.149061       ⋅          …    ⋅            ⋅           ⋅ 
+ -0.00838251    0.0250901        ⋅            ⋅           ⋅ 
+ -3.58984e-5   -0.00630153       ⋅            ⋅           ⋅ 
+  0.00137296   -0.00359297       ⋅            ⋅           ⋅ 
+ -0.00172894    0.00475108       ⋅            ⋅           ⋅ 
+ -0.0027409     0.029463    …    ⋅            ⋅           ⋅ 
+ -0.00595888   -0.00512494       ⋅            ⋅           ⋅ 
+  0.000255923  -0.00644225       ⋅            ⋅           ⋅ 
+ -0.000385188  -0.00519724       ⋅            ⋅           ⋅ 
+  0.000447806  -0.00146935       ⋅            ⋅           ⋅ 
+  0.0104856    -0.0052661   …   0.0216549     ⋅           ⋅ 
+ -0.0169155     0.0415363      -0.0114656    0.0180672    ⋅ 
+  0.0111835    -0.0243803       0.00163862  -0.00261288  0.0180538
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">heatmap</span><span class="x">(</span><span class="n">cov</span><span class="x">(</span><span class="n">A</span> <span class="o">*</span> <span class="n">A</span><span class="err">'</span><span class="x">))</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_68_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">zs</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q_full_normal</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p1</span> <span class="o">=</span> <span class="n">plot_variational_marginals</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">q_mf_normal</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">),</span> <span class="n">sym2range</span><span class="x">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">plot_variational_marginals</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">q_full_normal</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">),</span> <span class="n">sym2range</span><span class="x">)</span>
+
+<span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">,</span> <span class="n">layout</span> <span class="o">=</span> <span class="x">(</span><span class="mi">1</span><span class="x">,</span> <span class="mi">2</span><span class="x">),</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">800</span><span class="x">,</span> <span class="mi">2000</span><span class="x">))</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_70_1.png" alt="" /></p>
+<p>So it seems like the &quot;full&quot; ADVI approach, i.e. no mean-field assumption, obtain the same modes as the mean-field approach but with greater uncertainty for some of the <code>coefficients</code>. This</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Unfortunately, it seems like this has quite a high variance which is likely to be due to numerical instability, </span>
+<span class="c"># so we consider a larger number of samples. If we get a couple of outliers due to numerical issues, </span>
+<span class="c"># these kind affect the mean prediction greatly.</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q_full_normal</span><span class="x">,</span> <span class="mi">10_000</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_cut</span><span class="o">.</span><span class="n">VIFullPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">train</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+<span class="n">test_cut</span><span class="o">.</span><span class="n">VIFullPredictions</span> <span class="o">=</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">);</span>
+</code></pre></div></div>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vi_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">vifull_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">VIFullPredictions</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">bayes_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">ols_loss1</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">train_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">-</span> <span class="n">train_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+
+<span class="n">vi_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">VIPredictions</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">vifull_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">VIFullPredictions</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">bayes_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">BayesPredictions</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+<span class="n">ols_loss2</span> <span class="o">=</span> <span class="n">mean</span><span class="x">((</span><span class="n">test_cut</span><span class="o">.</span><span class="n">OLSPrediction</span> <span class="o">-</span> <span class="n">test_cut</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span><span class="o">.^</span><span class="mi">2</span><span class="x">)</span>
+
+<span class="n">println</span><span class="x">(</span><span class="s">"Training set:
+    VI loss: </span><span class="si">$</span><span class="s">vi_loss1
+    Bayes loss: </span><span class="si">$</span><span class="s">bayes_loss1
+    OLS loss: </span><span class="si">$</span><span class="s">ols_loss1
+Test set: 
+    VI loss: </span><span class="si">$</span><span class="s">vi_loss2
+    Bayes loss: </span><span class="si">$</span><span class="s">bayes_loss2
+    OLS loss: </span><span class="si">$</span><span class="s">ols_loss2"</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>Training set:
+    VI loss: 0.0007001199110320346
+    Bayes loss: 1.3743352743877082e-14
+    OLS loss: 3.070926124893025
+Test set: 
+    VI loss: 0.0014915402827578768
+    Bayes loss: 9.410239119029718e-14
+    OLS loss: 27.094813070760445
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q_mf_normal</span><span class="x">,</span> <span class="mi">1000</span><span class="x">);</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">hcat</span><span class="x">([</span><span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">[</span><span class="o">:</span><span class="x">,</span> <span class="n">i</span><span class="x">],</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span> <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="mi">2</span><span class="x">)]</span><span class="o">...</span><span class="x">);</span>
+
+<span class="n">p1</span> <span class="o">=</span> <span class="n">scatter</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"prediction (mean ± std)"</span><span class="x">,</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">),</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="x">)</span>
+<span class="n">scatter!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_label</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"true"</span><span class="x">)</span>
+<span class="n">xaxis!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">))</span>
+<span class="n">ylims!</span><span class="x">(</span><span class="mi">95</span><span class="x">,</span> <span class="mi">140</span><span class="x">)</span>
+<span class="n">title!</span><span class="x">(</span><span class="s">"Mean-field ADVI (Normal)"</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_74_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">rand</span><span class="x">(</span><span class="n">q_full_normal</span><span class="x">,</span> <span class="mi">1000</span><span class="x">);</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">hcat</span><span class="x">([</span><span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction</span><span class="x">(</span><span class="n">z</span><span class="x">[</span><span class="o">:</span><span class="x">,</span> <span class="n">i</span><span class="x">],</span> <span class="n">sym2range</span><span class="x">,</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span> <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">z</span><span class="x">,</span> <span class="mi">2</span><span class="x">)]</span><span class="o">...</span><span class="x">);</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">scatter</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"prediction (mean ± std)"</span><span class="x">,</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">),</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="x">)</span>
+<span class="n">scatter!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_label</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"true"</span><span class="x">)</span>
+<span class="n">xaxis!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">))</span>
+<span class="n">ylims!</span><span class="x">(</span><span class="mi">95</span><span class="x">,</span> <span class="mi">140</span><span class="x">)</span>
+<span class="n">title!</span><span class="x">(</span><span class="s">"Full ADVI (Normal)"</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_75_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">preds</span> <span class="o">=</span> <span class="n">hcat</span><span class="x">([</span><span class="n">unstandardize</span><span class="x">(</span><span class="n">prediction_chain</span><span class="x">(</span><span class="n">chain</span><span class="x">[</span><span class="n">i</span><span class="x">],</span> <span class="n">test</span><span class="x">),</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">)</span> <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="mi">5</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">chain</span><span class="x">,</span> <span class="mi">1</span><span class="x">)]</span><span class="o">...</span><span class="x">);</span>
+
+<span class="n">p3</span> <span class="o">=</span> <span class="n">scatter</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">mean</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="x">(</span><span class="n">preds</span><span class="x">;</span> <span class="n">dims</span> <span class="o">=</span> <span class="mi">2</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"prediction (mean ± std)"</span><span class="x">,</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">500</span><span class="x">),</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="x">)</span>
+<span class="n">scatter!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">),</span> <span class="n">unstandardize</span><span class="x">(</span><span class="n">test_label</span><span class="x">,</span> <span class="n">data</span><span class="o">.</span><span class="n">MPG</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">"true"</span><span class="x">)</span>
+<span class="n">xaxis!</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="x">(</span><span class="n">test</span><span class="x">,</span> <span class="mi">1</span><span class="x">))</span>
+<span class="n">ylims!</span><span class="x">(</span><span class="mi">95</span><span class="x">,</span> <span class="mi">140</span><span class="x">)</span>
+<span class="n">title!</span><span class="x">(</span><span class="s">"MCMC (NUTS)"</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_76_1.png" alt="" /></p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">,</span> <span class="n">p3</span><span class="x">,</span> <span class="n">layout</span> <span class="o">=</span> <span class="x">(</span><span class="mi">1</span><span class="x">,</span> <span class="mi">3</span><span class="x">),</span> <span class="n">size</span> <span class="o">=</span> <span class="x">(</span><span class="mi">900</span><span class="x">,</span> <span class="mi">250</span><span class="x">),</span> <span class="n">label</span><span class="o">=</span><span class="s">""</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/09_variational-inference_77_1.png" alt="" /></p>
+<p>Here we actually see that indeed both the full ADVI and the MCMC approaches does a much better job of quantifying the uncertainty of predictions for never-before-seen samples, with full ADVI seemingly <em>overestimating</em> the variance slightly compared to MCMC.</p>
+<p>So now you know how to do perform VI on your Turing.jl model! Great isn't it?</p>
+<h2 id="appendix">Appendix</h2>
+<p>This tutorial is part of the TuringTutorials repository, found at: <a href="https://github.com/TuringLang/TuringTutorials">https://github.com/TuringLang/TuringTutorials</a>.</p>
+<p>To locally run this tutorial, do the following commands:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">TuringTutorials</span>
+<span class="n">TuringTutorials</span><span class="o">.</span><span class="n">weave_file</span><span class="x">(</span><span class="s">"09-variational-inference"</span><span class="x">,</span> <span class="s">"09_variational-inference.jmd"</span><span class="x">)</span>
+</code></pre></div></div>
+<p>Computer Information:</p>
+<pre><code>Julia Version 1.5.3
+Commit 788b2c77c1 (2020-11-09 13:37 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-9.0.1 (ORCJIT, skylake)
+Environment:
+  JULIA_CMDSTAN_HOME = /home/cameron/stan/
+  JULIA_NUM_THREADS = 16
+
+</code></pre>
+<p>Package Information:</p>
+<pre><code>Status `~/.julia/dev/TuringTutorials/tutorials/09-variational-inference/Project.toml`
+  [76274a88] Bijectors v0.8.16
+  [b0b7db55] ComponentArrays v0.8.22
+  [1624bea9] ConjugatePriors v0.4.0
+  [5789e2e9] FileIO v1.8.0
+  [38e38edf] GLM v1.4.1
+  [b964fa9f] LaTeXStrings v1.2.1
+  [91a5bcdd] Plots v1.12.0
+  [d330b81b] PyPlot v2.9.0
+  [ce6b1742] RDatasets v0.6.10
+  [f3b207a7] StatsPlots v0.14.19
+  [fce5fe82] Turing v0.14.12
+  [3a884ed6] UnPack v1.0.2
+  [9a3f8284] Random
+
+</code></pre>
+    
+<script
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function() {
+
+    var toc = $('#nav-toc');
+
+    // Select each header
+    sections = $('#md-container-pancakes h1');
+        $.each(sections, function(idx, v) {
+            section = $(v);
+            var div_id = $(section).attr('id');
+            var div_text = section.text().split('¶')[0];
+            var parent = $("#" + div_id)
+            var content = '<li id="link_' + div_id + '" class="md-nav__item"><a class="md-nav__link toc-side-bar" href="#' + div_id + '" title="' + div_text +'">' + div_text +'</a></li>';
+            $(toc).append(content);
+
+            // Add section code to subnavigation
+            var children = $('<nav class="md-nav"><ul class="md-nav__list"></nav></ul>')
+            var contenders = $("#" + div_id).nextUntil( "h1" );
+            $.each(contenders, function(idx, contender){
+            if($(contender).is('h2')) {
+                var contender_id = $(contender).attr('id');
+                var contender_text = $(contender).text().split('¶')[0];
+                var content = '<li class="md-nav__item"><a class="md-nav__link toc-side-bar" href="#' + contender_id + '" title="' + contender_text +'">' + contender_text +'</a></li>';
+                children.append(content);
+                }
+            })
+            $("#link_" + div_id).append(children);
+        });
+    });
+</script>
+    <!-- this will parse through the header fields and add a button to open
+     an issue / ask a question on Github. The editable field should be in
+     the post frontend matter, and refer to the label to open the issue for -->
+
+<style>
+.more {
+    float:right;
+    font-size: 1.0rem !important;
+}
+.more:hover {
+    color: cornflowerblue !important;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    font-weight: 200;
+    box-shadow: 0px 8px 6px 0px rgba(0,0,0,0.2);
+    padding: 0px 10px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
+
+
+    </article>
+</div>      
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="c-footer md-footer-nav">
+  <div class="md-footer-copyright__highlight">
+    
+    Turing is created by <a style="color:inherit; text-decoration: underline;" href="http://mlg.eng.cam.ac.uk/hong/">Hong Ge</a>, 
+    and lovingly maintained by the <a style="color:inherit; text-decoration: underline;" href="https://github.com/TuringLang/Turing.jl/graphs/contributors">core team</a> of volunteers.
+
+    <br><br>
+    
+    The contents of this website are
+© 2021 under the terms of the <a style="color:inherit; text-decoration: underline;" href="https://github.com/TuringLang/Turing.jl/blob/master/LICENCE">MIT License</a>.
+    
+  </div>  
+</footer>
+
+
+    <script src="/dev/assets/js/application.js"></script>
+    
+    <script>console.log('3')</script>
+    <script>app.initialize({version:"0.17.4", url:{base:'/dev'}})</script>
+
+    
+    <script src="/dev/assets/js/version-switch.js"></script>
+
+    <script>
+ var headers = ["h1", "h2", "h3", "h4"]
+ var colors = ["red", "orange", "green", "blue"]
+
+ $.each(headers, function(i, header){
+   var color = colors[i];
+   $(header).each(function () {
+     var href=$(this).attr("id");
+     $(this).append('<a class="headerlink" style="color:' + color + '" href="#' + href + '" title="Permanent link">¶</a>')
+   });
+ })
+
+ // Ensure that sidebar on left has arrows
+ $(".pancakes-parent").on('click', function(){
+   console.log($(this).next());
+   $(this).next().find('.pancakes-child').toggle();
+   if ($(this).hasClass('open-parent')){
+     $(this).removeClass('open-parent');
+   } else {
+     $(this).addClass('open-parent');
+   }
+ })
+
+ $(".pancakes-parent-mobile").on('click', function(){
+   var nav = $(this).next();
+   nav.addClass('mobile-sub-navbar-display');
+ })
+
+ $(".mobile-navbar-back").on('click', function(){
+   var nav = $(this).parent();
+   nav.removeClass('mobile-sub-navbar-display');
+ })
+
+</script>
+
+<script>
+ MathJax = {
+   tex: {
+     inlineMath: [['$', '$'], ['$$', '$$']]
+   }
+ };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+    <script>
+$('h1').first().append('<div></div>')</script>
+
+    <style>
+#scrolltop {
+  display: none; /* Hidden by default */
+  position: fixed; /* Fixed/sticky position */
+  bottom: 20px; /* Place the button at the bottom of the page */
+  right: 30px; /* Place the button 30px from the right */
+  z-index: 99; /* Make sure it does not overlap */
+  border: none; /* Remove borders */
+  outline: none; /* Remove outline */
+  background-color: #d2e6f5; /* Set a background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Add a mouse pointer on hover */
+  padding: 10px 15px; /* Some padding */
+  border-radius: 100px; /* Rounded corners */
+  font-size: 18px; /* Increase font size */
+  font-weight: 600;
+}
+
+#scrolltop:hover {
+  background-color: #555; /* Add a dark-grey background on hover */
+}
+</style>
+<button onclick="topFunction()" id="scrolltop" title="Go to top">🔝</button>
+
+<script>
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("scrolltop").style.display = "block";
+  } else {
+    document.getElementById("scrolltop").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+</script>
+
+    
+
+
+  </body>
+</html>
