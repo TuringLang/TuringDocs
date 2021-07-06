@@ -116,9 +116,9 @@ version = "0.8.21"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "aec96e79e396dfa7f762c90e3cac8f15ddb43f03"
+git-tree-sha1 = "dcc25ff085cf548bc8befad5ce048391a7c07d40"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.10"
+version = "0.10.11"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random", "StaticArrays"]
@@ -872,9 +872,9 @@ version = "1.18.0"
 
 [[Polyester]]
 deps = ["ArrayInterface", "IfElse", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities", "VectorizationBase"]
-git-tree-sha1 = "04a03d3f8ae906f4196b9085ed51506c4b466340"
+git-tree-sha1 = "0ad72bf3e19ceb7a3150b2fb35e746aa8c6e1c85"
 uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
-version = "0.3.1"
+version = "0.3.2"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -936,9 +936,9 @@ version = "1.1.1"
 
 [[RecipesPipeline]]
 deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
-git-tree-sha1 = "9b8e57e3cca8828a1bc759840bfe48d64db9abfb"
+git-tree-sha1 = "2a7a2469ed5d94a98dea0e85c46fa653d76be0cd"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
-version = "0.3.3"
+version = "0.3.4"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
