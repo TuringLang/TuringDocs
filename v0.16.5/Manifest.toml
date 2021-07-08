@@ -122,9 +122,9 @@ version = "0.10.11"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random", "StaticArrays"]
-git-tree-sha1 = "c8fd01e4b736013bc61b704871d20503b33ea402"
+git-tree-sha1 = "ed268efe58512df8c7e224d2e170afd76dd6a417"
 uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
-version = "3.12.1"
+version = "3.13.0"
 
 [[ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -245,9 +245,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "9f35e8c1b24d8d7337835942fb23210931d16f12"
+git-tree-sha1 = "d5fa76fdab7bf54615262bd639e8c2e9bf295444"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.9"
+version = "0.25.10"
 
 [[DistributionsAD]]
 deps = ["Adapt", "ChainRules", "ChainRulesCore", "Compat", "DiffRules", "Distributions", "FillArrays", "LinearAlgebra", "NaNMath", "PDMats", "Random", "Requires", "SpecialFunctions", "StaticArrays", "StatsBase", "StatsFuns", "ZygoteRules"]
@@ -682,9 +682,9 @@ version = "0.4.7"
 
 [[LoopVectorization]]
 deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Polyester", "Requires", "SLEEFPirates", "Static", "StrideArraysCore", "ThreadingUtilities", "UnPack", "VectorizationBase"]
-git-tree-sha1 = "20316f08f70fae085ed90c7169ae318c036ee83b"
+git-tree-sha1 = "652a17092a160bb9677eefb18db31d717e7a4078"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
-version = "0.12.49"
+version = "0.12.50"
 
 [[MCMCChains]]
 deps = ["AbstractFFTs", "AbstractMCMC", "AxisArrays", "Compat", "Dates", "Distributions", "Formatting", "IteratorInterfaceExtensions", "LinearAlgebra", "MLJModelInterface", "NaturalSort", "PrettyTables", "Random", "RecipesBase", "Serialization", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "TableTraits", "Tables"]
@@ -877,9 +877,9 @@ version = "1.18.1"
 
 [[Polyester]]
 deps = ["ArrayInterface", "IfElse", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities", "VectorizationBase"]
-git-tree-sha1 = "0ad72bf3e19ceb7a3150b2fb35e746aa8c6e1c85"
+git-tree-sha1 = "2ccf43e4dcedfa4eab54a0848687a1a8b502c224"
 uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
-version = "0.3.2"
+version = "0.3.3"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -947,9 +947,9 @@ version = "0.3.4"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "e205e8c50633f96dbc59d4ae760f4e9e4d445fdb"
+git-tree-sha1 = "8755b407ac7de9256b21b5da1c7304aa3e398847"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.14.5"
+version = "2.14.8"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization"]
@@ -1003,9 +1003,9 @@ version = "0.2.0"
 
 [[SciMLBase]]
 deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "50294d98330855582e52f19e21196fc5b6099415"
+git-tree-sha1 = "932aaae93e81686e6473f27b5a11c403576a2183"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.17.1"
+version = "1.18.0"
 
 [[ScientificTypesBase]]
 git-tree-sha1 = "3f7ddb0cf0c3a4cff06d9df6f01135fa5442c99b"
@@ -1076,9 +1076,9 @@ version = "0.2.5"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "896d55218776ab8f23fb7b222a5a4a946d4aafc2"
+git-tree-sha1 = "a43a7b58a6e7dc933b2fa2e0ca653ccf8bb8fd0e"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.5"
+version = "1.2.6"
 
 [[StatisticalTraits]]
 deps = ["ScientificTypesBase"]
@@ -1109,9 +1109,9 @@ version = "0.9.8"
 
 [[StrideArraysCore]]
 deps = ["ArrayInterface", "Requires", "ThreadingUtilities", "VectorizationBase"]
-git-tree-sha1 = "efcdfcbb8cf91e859f61011de1621be34b550e69"
+git-tree-sha1 = "1680c2e3bc985714a20b7a488a2fc4ef2949583e"
 uuid = "7792a7ef-975c-4747-a70f-980b88e8d1da"
-version = "0.1.13"
+version = "0.1.14"
 
 [[StringEncodings]]
 deps = ["Libiconv_jll"]
