@@ -705,9 +705,9 @@ uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.6"
 
 [[ManualMemory]]
-git-tree-sha1 = "2510eec385f6f4305be9ac9b8dbbe86f810ba62e"
+git-tree-sha1 = "80ccdd8143934c40a170ef3178af64b7905230bd"
 uuid = "d125e4d3-2237-4719-b19c-fa641b8a4667"
-version = "0.1.2"
+version = "0.1.3"
 
 [[MappedArrays]]
 git-tree-sha1 = "18d3584eebc861e311a552cbb67723af8edff5de"
@@ -759,9 +759,9 @@ version = "1.0.10"
 
 [[NNlib]]
 deps = ["Adapt", "ChainRulesCore", "Compat", "LinearAlgebra", "Pkg", "Requires", "Statistics"]
-git-tree-sha1 = "7e6f31cfa39b1ff1c541cc8580b14b0ff4ba22d0"
+git-tree-sha1 = "abc8d768a2d2c14537d95b5f8b81762c33c7856d"
 uuid = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
-version = "0.7.23"
+version = "0.7.24"
 
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
