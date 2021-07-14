@@ -378,9 +378,9 @@ version = "1.0.10+0"
 
 [[Functors]]
 deps = ["MacroTools"]
-git-tree-sha1 = "a7bb2af991c43dcf5c3455d276dd83976799634f"
+git-tree-sha1 = "c18e8fcd40b24e20ef035495391f9b0e653b6dc3"
 uuid = "d9f16b24-f501-4c13-a1f2-28368ffc5196"
-version = "0.2.1"
+version = "0.2.2"
 
 [[Future]]
 deps = ["Random"]
@@ -871,9 +871,9 @@ version = "1.0.11"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "f32cd6fcd2909c2d1cdd47ce55e1394b04a66fe2"
+git-tree-sha1 = "83c762ddea05f5554e1b04f4a5ecae61990ccc8e"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.18.2"
+version = "1.19.0"
 
 [[Polyester]]
 deps = ["ArrayInterface", "IfElse", "ManualMemory", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities", "VectorizationBase"]
