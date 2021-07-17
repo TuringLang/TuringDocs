@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-language" content="en">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bayesian Poisson Regression</title>
+    <meta name="description" content="Bayesian Poisson Regression">
+    <meta name="author" content="The Turing Team">
+    <meta name="theme-color" content="red">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+    <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="canonical" href="/dev/tutorials/07-poisson-regression/">
+    <link rel="alternate" type="application/rss+xml" title="Turing.jl" href="/dev/feed.xml">
+    <meta name="lang:clipboard.copy" content="Copy to clipboard">
+    <meta name="lang:clipboard.copied" content="Copied to clipboard">
+    <meta name="lang:search.language" content="en">
+    <meta name="lang:search.pipeline.stopwords" content="True">
+    <meta name="lang:search.pipeline.trimmer" content="True">
+    <meta name="lang:search.result.none" content="No matching documents">
+    <meta name="lang:search.result.one" content="1 matching document">
+    <meta name="lang:search.result.other" content="# matching documents">
+    <meta name="lang:search.tokenizer" content="[\s\-]+">
+    <script src="/versions.js"></script>
+    <script src="/dev/assets/js/modernizr.74668098.js"></script>
+    <link rel="shortcut icon" href="/dev/assets/img/favicon.ico">
+    <link rel="stylesheet" href="/dev/assets/css/main.css">
+    <link rel="stylesheet" href="/dev/assets/css/palette.css">
+    <link rel="stylesheet" href="/dev/assets/css/header.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+
+    
+
+  </head>
+
+  <body dir="ltr" data-md-color-primary="red" data-md-color-accent="red">
+    
+
+<svg class="md-svg">
+<defs>
+  <svg>
+  <path d="M160 304q0 10-3.125 20.5t-10.75 19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75 19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360 304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25 2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75 1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75 0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5 46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z" fill="currentColor"></path></svg>
+</defs></svg>
+
+    <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off>
+    <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off>
+    <label class=md-overlay data-md-component=overlay for=__drawer></label> <a href="#bayesian-poisson-regression" tabindex=1 class=md-skip> Skip to content </a>
+    <header class=md-header data-md-component=header data-md-state=none>
+        <nav class="md-header-nav md-grid">
+            <div class=md-flex>
+                <div class="md-flex__cell md-flex__cell--shrink">
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer></label>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <a class="md-header-nav__button md-logo" href="/dev/" title="Turing.jl">
+                    <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title>
+                        <span class=md-header-nav__topic>Turing.jl</span>
+                    </div>
+                    </a>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <div class="dropdown version-switch">
+                      <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      </a>
+                      <div class="dropdown-menu">
+                        <!-- a class="dropdown-item" href="#">Stable</a -->
+                        <!-- div class="dropdown-divider"></div -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a class="md-source" href="/dev/docs/using-turing/get-started" title="Get started">
+                      Get Started
+                    </a>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <div class="md-header-nav__source">
+                      <a class="md-source" href="/dev/docs/using-turing/" title="View documentation">
+                        Documentation
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/tutorials/" title="View tutorials">
+                          Tutorials
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/news/" title="News">
+                          News
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="md-flex__cell md-flex__cell--shrink">
+                      <div class="md-header-nav__source">
+                        <a class="md-source" href="/dev/team/" title="Team">
+                          Team
+                        </a>
+                      </div>
+                    </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a class="md-source" data-md-source="github" href="https://github.com/TuringLang/Turing.jl" title="Go to repository">
+                    <div class="md-source__icon" style="padding-top:5px">
+                      <i class="fa fa-github fa-3x"></i>
+                    </div>
+                    <div class="md-source__repository">
+                      TuringLang/Turing.jl
+                    </div></a>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                  <div class="md-header-nav__source">
+                    <a href="https://twitter.com/TuringLang?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+                       data-size="large" data-show-screen-name="false" data-show-count="false">Follow @TuringLang</a>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                  </div>
+                </div>
+
+                <div class="md-flex__cell md-flex__cell--shrink">
+                    <label class="md-icon md-icon--search md-header-nav__button" for=__search></label>
+                    <div class=md-search data-md-component=search role=dialog>
+                        <label class=md-search__overlay for=__search></label>
+                        <div class=md-search__inner role=search>
+                            <form class=md-search__form name=search>
+                                <input type=text class=md-search__input name=query placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=query data-md-state=active>
+                                <label class="md-icon md-search__icon" for=__search></label>
+                                <button type=reset class="md-icon md-search__icon" data-md-component=reset tabindex=-1> &#xE5CD; </button>
+                            </form>
+                            <div class=md-search__output>
+                                <div class=md-search__scrollwrap data-md-scrollfix>
+                                    <div class=md-search-result data-md-component=result>
+                                        <div class=md-search-result__meta> Type to start searching </div>
+                                        <ol class=md-search-result__list></ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+  </nav>
+</header>
+
+
+    <div class="md-container">
+        <main class="md-main">
+            <div class="md-main__inner md-grid full-width" data-md-component="container">
+            
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+  <div class="md-sidebar__scrollwrap">
+    <div class="md-sidebar__inner">
+      <nav class="md-nav md-nav--primary" data-md-level="0">
+
+        <label class="md-nav__title md-nav__title--site">
+            <a class="" href="/dev/" title="Turing.jl">
+              <span class="md-nav__button md-logo">
+                Turing.jl
+              </span>
+            </a>
+        </label>
+
+        <ul class="md-nav__list" data-md-scrollfix="">
+          <li class="md-nav__item md-nav__item--active">
+            <input class="md-toggle md-nav__toggle" data-md-toggle="toc" id="__toc" type="checkbox" />
+
+            <nav class="md-nav md-nav--secondary">
+
+                <a class="" href="/dev/" title="Turing.jl">
+                  <label class="md-nav__title md-nav__title--site">
+                    <span class="md-nav__button md-logo">
+                      Turing.jl
+                    </span>
+                  </label>
+                </a>
+
+                <div class="md-nav__source">
+                    <a class="md-source" data-md-source="github" href="https://github.com/TuringLang/Turing.jl" title="Go to repository">
+                    <span class="md-source__icon">
+                        <i class="fa fa-github fa-3x"></i>
+                    </span>
+                    <span class="md-source__repository">
+                      TuringLang/Turing.jl
+                    </span></a>
+                </div>
+
+                <div class="md-nav__dropdown">
+                  <select id="version-selector">
+                    <!-- option value="#" selected="selected">v 0.5.1</option -->
+                  </select>
+                </div>
+
+              <label class="md-nav__title" for="__drawer"></label>
+
+              
+
+                <ul class="md-nav__list" data-md-scrollfix="">
+                  
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-using-turing" title="USING TURING">USING TURING</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/get-started"
+                              id="pancakes-getting-started"
+                              title="Getting Started">Getting Started</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/quick-start"
+                              id="pancakes-quick-start"
+                              title="Quick Start">Quick Start</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/guide"
+                              id="pancakes-guide"
+                              title="Guide">Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/advanced"
+                              id="pancakes-advanced-usage"
+                              title="Advanced Usage">Advanced Usage</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/autodiff"
+                              id="pancakes-automatic-differentiation"
+                              title="Automatic Differentiation">Automatic Differentiation</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/performancetips"
+                              id="pancakes-performance-tips"
+                              title="Performance Tips">Performance Tips</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/dynamichmc"
+                              id="pancakes-using-dynamichmc"
+                              title="Using DynamicHMC">Using DynamicHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/using-turing/sampler-viz"
+                              id="pancakes-sampler-visualization"
+                              title="Sampler Visualization">Sampler Visualization</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-for-developers" title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/compiler"
+                              id="pancakes-turing-compiler-design"
+                              title="Turing Compiler Design">Turing Compiler Design</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/interface"
+                              id="pancakes-interface-guide"
+                              title="Interface Guide">Interface Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/how_turing_implements_abstractmcmc"
+                              id="pancakes-how-turing-implements-abstractmcmc"
+                              title="How Turing implements AbstractMCMC">How Turing implements AbstractMCMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/for-developers/variational_inference"
+                              id="pancakes-variational-inference"
+                              title="Variational Inference">Variational Inference</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-tutorials" title="TUTORIALS">TUTORIALS</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials"
+                              id="pancakes-home"
+                              title="Home">Home</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/00-introduction"
+                              id="pancakes-introduction-to-turing"
+                              title="Introduction to Turing">Introduction to Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/01-gaussian-mixture-model"
+                              id="pancakes-gaussian-mixture-models"
+                              title="Gaussian Mixture Models">Gaussian Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/02-logistic-regression"
+                              id="pancakes-bayesian-logistic-regression"
+                              title="Bayesian Logistic Regression">Bayesian Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/03-bayesian-neural-network"
+                              id="pancakes-bayesian-neural-networks"
+                              title="Bayesian Neural Networks">Bayesian Neural Networks</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/04-hidden-markov-model"
+                              id="pancakes-hidden-markov-models"
+                              title="Hidden Markov Models">Hidden Markov Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/05-linear-regression"
+                              id="pancakes-linear-regression"
+                              title="Linear Regression">Linear Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/06-infinite-mixture-model"
+                              id="pancakes-infinite-mixture-models"
+                              title="Infinite Mixture Models">Infinite Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/07-poisson-regression"
+                              id="pancakes-bayesian-poisson-regression"
+                              title="Bayesian Poisson Regression">Bayesian Poisson Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/08-multinomial-logistic-regression"
+                              id="pancakes-multinomial-logistic-regression"
+                              title="Multinomial Logistic Regression">Multinomial Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/09-variational-inference"
+                              id="pancakes-variational-inference"
+                              title="Variational Inference">Variational Inference</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/tutorials/10-bayesian-differential-equations"
+                              id="pancakes-bayesian-differential-equation"
+                              title="Bayesian Differential Equation">Bayesian Differential Equation</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-api" title="API">API</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library"
+                              id="pancakes-turing"
+                              title="Turing">Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library/advancedhmc/"
+                              id="pancakes-advancedhmc"
+                              title="AdvancedHMC">AdvancedHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/library/bijectors/"
+                              id="pancakes-bijectors"
+                              title="Bijectors">Bijectors</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                  
+                  <li class="md-nav__item md-nav__item--nested navbar_bottom-border">
+                    <a class="md-nav__link pancakes-parent-mobile"
+                    id="pancakes-contributing" title="CONTRIBUTING">CONTRIBUTING</a>
+                    
+                    <nav class="md-nav md-nav--secondary">
+                      <a class="md-nav__title mobile-navbar-back" for="__toc">Table of contents</a>
+                      <ul class="md-nav__list" data-md-scrollfix="">
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/contributing/guide"
+                              id="pancakes-how-to-contribute"
+                              title="How to Contribute">How to Contribute</a>
+                        </li>
+                        
+                        <li class="md-nav__item navbar_bottom-border">
+                          <a class="md-nav__link" href="/dev/docs/contributing/style-guide"
+                              id="pancakes-style-guide"
+                              title="Style Guide">Style Guide</a>
+                        </li>
+                        
+                      </ul>
+                    </nav>
+                    
+                  </li>
+                  
+                </ul>
+            </nav>
+          </li>
+
+          <!-- This navigation is completely for mobile -->
+          <li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="USING TURING">USING TURING</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="TUTORIALS">TUTORIALS</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="API">API</a>
+          </li><li class="md-nav__item mobile-nav" style="display:none">
+            <a class="md-nav__link" title="CONTRIBUTING">CONTRIBUTING</a>
+          </li>
+
+          <!-- This navigation is completely for non mobile -->
+          
+
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-using-turing"
+                title="USING TURING">USING TURING</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/get-started"
+                           title="Getting Started" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Getting Started</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/quick-start"
+                           title="Quick Start" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Quick Start</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/guide"
+                           title="Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/advanced"
+                           title="Advanced Usage" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Advanced Usage</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/autodiff"
+                           title="Automatic Differentiation" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Automatic Differentiation</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/performancetips"
+                           title="Performance Tips" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Performance Tips</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/dynamichmc"
+                           title="Using DynamicHMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Using DynamicHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/using-turing/sampler-viz"
+                           title="Sampler Visualization" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Sampler Visualization</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-for-developers"
+                title="FOR DEVELOPERS">FOR DEVELOPERS</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/compiler"
+                           title="Turing Compiler Design" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Turing Compiler Design</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/interface"
+                           title="Interface Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Interface Guide</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/how_turing_implements_abstractmcmc"
+                           title="How Turing implements AbstractMCMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">How Turing implements AbstractMCMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/for-developers/variational_inference"
+                           title="Variational Inference" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Variational Inference</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent open-parent"
+                id="pancakes-tutorials"
+                title="TUTORIALS">TUTORIALS</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials"
+                           title="Home" 
+                           
+                           class="md-nav__link pancakes-child">Home</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/00-introduction"
+                           title="Introduction to Turing" 
+                           
+                           class="md-nav__link pancakes-child">Introduction to Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/01-gaussian-mixture-model"
+                           title="Gaussian Mixture Models" 
+                           
+                           class="md-nav__link pancakes-child">Gaussian Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/02-logistic-regression"
+                           title="Bayesian Logistic Regression" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/03-bayesian-neural-network"
+                           title="Bayesian Neural Networks" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Neural Networks</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/04-hidden-markov-model"
+                           title="Hidden Markov Models" 
+                           
+                           class="md-nav__link pancakes-child">Hidden Markov Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/05-linear-regression"
+                           title="Linear Regression" 
+                           
+                           class="md-nav__link pancakes-child">Linear Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/06-infinite-mixture-model"
+                           title="Infinite Mixture Models" 
+                           
+                           class="md-nav__link pancakes-child">Infinite Mixture Models</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/07-poisson-regression"
+                           title="Bayesian Poisson Regression" 
+                            style="color: red;"
+                           class="md-nav__link pancakes-child">Bayesian Poisson Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/08-multinomial-logistic-regression"
+                           title="Multinomial Logistic Regression" 
+                           
+                           class="md-nav__link pancakes-child">Multinomial Logistic Regression</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/09-variational-inference"
+                           title="Variational Inference" 
+                           
+                           class="md-nav__link pancakes-child">Variational Inference</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/tutorials/10-bayesian-differential-equations"
+                           title="Bayesian Differential Equation" 
+                           
+                           class="md-nav__link pancakes-child">Bayesian Differential Equation</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-api"
+                title="API">API</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library"
+                           title="Turing" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Turing</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library/advancedhmc/"
+                           title="AdvancedHMC" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">AdvancedHMC</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/library/bijectors/"
+                           title="Bijectors" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Bijectors</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+         <li class="md-nav__item md-nav__item--nested not-mobile-nav invisible">
+             <a class="md-nav__link pancakes-parent "
+                id="pancakes-contributing"
+                title="CONTRIBUTING">CONTRIBUTING</a>
+                
+                <nav class="md-nav">
+                    <ul class="md-nav__list">
+                        
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/contributing/guide"
+                           title="How to Contribute" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">How to Contribute</a>
+                        </li>
+                        
+                        <li class="md-nav__item">
+                        <a href="/dev/docs/contributing/style-guide"
+                           title="Style Guide" style="display:none;"
+                           
+                           class="md-nav__link pancakes-child">Style Guide</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+         </li>
+         
+         
+
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+<div class="md-sidebar md-sidebar--secondary invisible" data-md-component="toc">
+  <div class="md-sidebar__scrollwrap">
+    <div class="md-sidebar__inner">
+      <nav class="md-nav md-nav--secondary">
+        <label class="md-nav__title" for="__toc">Table of contents</label>
+        <ul id="nav-toc" class="md-nav__list" data-md-scrollfix="">
+        <!-- toc will be appended here!-->
+        </ul>
+        <a href="https://twitter.com/intent/tweet?original_referer=https://github.com/TuringLang/Turing.jl/edit/master/docs/src_tutorials/07_poisson-regression.md" title="Tweet this page" class="social-link"><i class="fa fa-twitter fa-1x"></i>Tweet this page</a>
+        <a href="https://discourse.julialang.org/c/domain/probprog" title="Ask questions" class="social-link"><i class="fa fa-stack-overflow fa-1x"></i>Ask questions</a>
+        <a href="https://github.com/TuringLang/Turing.jl//issues/new?label=question&title=Question:&body=Question%20on:%20https://github.com/TuringLang/Turing.jl/edit/master/docs/_tutorials/07_poisson-regression.md" title="Report issues" class="social-link"><i class="fa fa-comments fa-1x"></i>Report issues</a>
+        <a href="https://github.com/TuringLang/Turing.jl/edit/master/docs/src_tutorials/07_poisson-regression.md" title="Edit this page on github"  class="social-link"><i class="fa fa-github fa-1x"></i> Edit me</a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+                <div id="md-container-pancakes">
+                <div class="md-content full-width"> 
+    <article class="md-content__inner md-typeset  full-width">
+    <h1 id="bayesian-poisson-regression">Bayesian Poisson Regression</h1>
+<p>This notebook is ported from the <a href="https://docs.pymc.io/notebooks/GLM-poisson-regression.html">example notebook</a> of PyMC3 on Poisson Regression.</p>
+<p><a href="https://en.wikipedia.org/wiki/Poisson_regression">Poisson Regression</a> is a technique commonly used to model count data. Some of the applications include predicting the number of people defaulting on their loans or the number of cars running on a highway on a given day. This example describes a method to implement the Bayesian version of this technique using Turing.</p>
+<p>We will generate the dataset that we will be working on which describes the relationship between number of times a person sneezes during the day with his alcohol consumption and medicinal intake.</p>
+<p>We start by importing the required libraries.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#Import Turing, Distributions and DataFrames</span>
+<span class="k">using</span> <span class="n">Turing</span><span class="x">,</span> <span class="n">Distributions</span><span class="x">,</span> <span class="n">DataFrames</span><span class="x">,</span> <span class="n">Distributed</span>
+
+<span class="c"># Import MCMCChain, Plots, and StatsPlots for visualizations and diagnostics.</span>
+<span class="k">using</span> <span class="n">MCMCChains</span><span class="x">,</span> <span class="n">Plots</span><span class="x">,</span> <span class="n">StatsPlots</span>
+
+<span class="c"># Set a seed for reproducibility.</span>
+<span class="k">using</span> <span class="n">Random</span>
+<span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="x">(</span><span class="mi">12</span><span class="x">);</span>
+
+<span class="c"># Turn off progress monitor.</span>
+<span class="n">Turing</span><span class="o">.</span><span class="n">setprogress!</span><span class="x">(</span><span class="nb">false</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>false
+</code></pre>
+<h1 id="generating-data">Generating data</h1>
+<p>We start off by creating a toy dataset. We take the case of a person who takes medicine to prevent excessive sneezing. Alcohol consumption increases the rate of sneezing for that person. Thus, the two factors affecting the number of sneezes in a given day are alcohol consumption and whether the person has taken his medicine. Both these variable are taken as boolean valued while the number of sneezes will be a count valued variable. We also take into consideration that the interaction between the two boolean variables will affect the number of sneezes</p>
+<p>5 random rows are printed from the generated data to get a gist of the data generated.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theta_noalcohol_meds</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c"># no alcohol, took medicine</span>
+<span class="n">theta_alcohol_meds</span> <span class="o">=</span> <span class="mi">3</span>      <span class="c"># alcohol, took medicine</span>
+<span class="n">theta_noalcohol_nomeds</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c"># no alcohol, no medicine</span>
+<span class="n">theta_alcohol_nomeds</span> <span class="o">=</span> <span class="mi">36</span>   <span class="c"># alcohol, no medicine</span>
+
+<span class="c"># no of samples for each of the above cases</span>
+<span class="n">q</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c">#Generate data from different Poisson distributions</span>
+<span class="n">noalcohol_meds</span> <span class="o">=</span> <span class="n">Poisson</span><span class="x">(</span><span class="n">theta_noalcohol_meds</span><span class="x">)</span>
+<span class="n">alcohol_meds</span> <span class="o">=</span> <span class="n">Poisson</span><span class="x">(</span><span class="n">theta_alcohol_meds</span><span class="x">)</span>
+<span class="n">noalcohol_nomeds</span> <span class="o">=</span> <span class="n">Poisson</span><span class="x">(</span><span class="n">theta_noalcohol_nomeds</span><span class="x">)</span>
+<span class="n">alcohol_nomeds</span> <span class="o">=</span> <span class="n">Poisson</span><span class="x">(</span><span class="n">theta_alcohol_nomeds</span><span class="x">)</span>
+
+<span class="n">nsneeze_data</span> <span class="o">=</span> <span class="n">vcat</span><span class="x">(</span><span class="n">rand</span><span class="x">(</span><span class="n">noalcohol_meds</span><span class="x">,</span> <span class="n">q</span><span class="x">),</span> <span class="n">rand</span><span class="x">(</span><span class="n">alcohol_meds</span><span class="x">,</span> <span class="n">q</span><span class="x">),</span> <span class="n">rand</span><span class="x">(</span><span class="n">noalcohol_nomeds</span><span class="x">,</span> <span class="n">q</span><span class="x">),</span> <span class="n">rand</span><span class="x">(</span><span class="n">alcohol_nomeds</span><span class="x">,</span> <span class="n">q</span><span class="x">)</span> <span class="x">)</span>
+<span class="n">alcohol_data</span> <span class="o">=</span> <span class="n">vcat</span><span class="x">(</span><span class="n">zeros</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">ones</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">zeros</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">ones</span><span class="x">(</span><span class="n">q</span><span class="x">)</span> <span class="x">)</span>
+<span class="n">meds_data</span> <span class="o">=</span> <span class="n">vcat</span><span class="x">(</span><span class="n">zeros</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">zeros</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">ones</span><span class="x">(</span><span class="n">q</span><span class="x">),</span> <span class="n">ones</span><span class="x">(</span><span class="n">q</span><span class="x">)</span> <span class="x">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="x">(</span><span class="n">nsneeze</span> <span class="o">=</span> <span class="n">nsneeze_data</span><span class="x">,</span> <span class="n">alcohol_taken</span> <span class="o">=</span> <span class="n">alcohol_data</span><span class="x">,</span> <span class="n">nomeds_taken</span> <span class="o">=</span> <span class="n">meds_data</span><span class="x">,</span> <span class="n">product_alcohol_meds</span> <span class="o">=</span> <span class="n">meds_data</span><span class="o">.*</span><span class="n">alcohol_data</span><span class="x">)</span>
+<span class="n">df</span><span class="x">[</span><span class="n">sample</span><span class="x">(</span><span class="mi">1</span><span class="o">:</span><span class="n">nrow</span><span class="x">(</span><span class="n">df</span><span class="x">),</span> <span class="mi">5</span><span class="x">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="nb">false</span><span class="x">),</span> <span class="o">:</span><span class="x">]</span>
+</code></pre></div></div>
+<pre><code>5×4 DataFrame
+ Row │ nsneeze  alcohol_taken  nomeds_taken  product_alcohol_meds
+     │ Int64    Float64        Float64       Float64
+─────┼────────────────────────────────────────────────────────────
+   1 │       1            1.0           0.0                   0.0
+   2 │       4            0.0           1.0                   0.0
+   3 │       0            0.0           0.0                   0.0
+   4 │       1            0.0           0.0                   0.0
+   5 │       0            0.0           0.0                   0.0
+</code></pre>
+<h1 id="visualisation-of-the-dataset">Visualisation of the dataset</h1>
+<p>We plot the distribution of the number of sneezes for the 4 different cases taken above. As expected, the person sneezes the most when he has taken alcohol and not taken his medicine. He sneezes the least when he doesn't consume alcohol and takes his medicine.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#Data Plotting</span>
+
+<span class="n">p1</span> <span class="o">=</span> <span class="n">Plots</span><span class="o">.</span><span class="n">histogram</span><span class="x">(</span><span class="n">df</span><span class="x">[(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">alcohol_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">0</span><span class="x">)</span> <span class="o">.&amp;</span> <span class="x">(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">nomeds_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">0</span><span class="x">),</span> <span class="mi">1</span><span class="x">],</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"no_alcohol+meds"</span><span class="x">)</span>  
+<span class="n">p2</span> <span class="o">=</span> <span class="n">Plots</span><span class="o">.</span><span class="n">histogram</span><span class="x">((</span><span class="n">df</span><span class="x">[(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">alcohol_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">1</span><span class="x">)</span> <span class="o">.&amp;</span> <span class="x">(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">nomeds_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">0</span><span class="x">),</span> <span class="mi">1</span><span class="x">]),</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"alcohol+meds"</span><span class="x">)</span>  
+<span class="n">p3</span> <span class="o">=</span> <span class="n">Plots</span><span class="o">.</span><span class="n">histogram</span><span class="x">((</span><span class="n">df</span><span class="x">[(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">alcohol_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">0</span><span class="x">)</span> <span class="o">.&amp;</span> <span class="x">(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">nomeds_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">1</span><span class="x">),</span> <span class="mi">1</span><span class="x">]),</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"no_alcohol+no_meds"</span><span class="x">)</span>  
+<span class="n">p4</span> <span class="o">=</span> <span class="n">Plots</span><span class="o">.</span><span class="n">histogram</span><span class="x">((</span><span class="n">df</span><span class="x">[(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">alcohol_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">1</span><span class="x">)</span> <span class="o">.&amp;</span> <span class="x">(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">nomeds_taken</span><span class="x">]</span> <span class="o">.==</span> <span class="mi">1</span><span class="x">),</span> <span class="mi">1</span><span class="x">]),</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"alcohol+no_meds"</span><span class="x">)</span>  
+<span class="n">plot</span><span class="x">(</span><span class="n">p1</span><span class="x">,</span> <span class="n">p2</span><span class="x">,</span> <span class="n">p3</span><span class="x">,</span> <span class="n">p4</span><span class="x">,</span> <span class="n">layout</span> <span class="o">=</span> <span class="x">(</span><span class="mi">2</span><span class="x">,</span> <span class="mi">2</span><span class="x">),</span> <span class="n">legend</span> <span class="o">=</span> <span class="nb">false</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/07_poisson-regression_3_1.png" alt="" /></p>
+<p>We must convert our <code>DataFrame</code> data into the <code>Matrix</code> form as the manipulations that we are about are designed to work with <code>Matrix</code> data. We also separate the features from the labels which will be later used by the Turing sampler to generate samples from the posterior.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Convert the DataFrame object to matrices.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="kt">Matrix</span><span class="x">(</span><span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,[</span><span class="o">:</span><span class="n">alcohol_taken</span><span class="x">,</span> <span class="o">:</span><span class="n">nomeds_taken</span><span class="x">,</span> <span class="o">:</span><span class="n">product_alcohol_meds</span><span class="x">]])</span>
+<span class="n">data_labels</span> <span class="o">=</span> <span class="n">df</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="n">nsneeze</span><span class="x">]</span>
+<span class="n">data</span>
+</code></pre></div></div>
+<pre><code>400×3 Array{Float64,2}:
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+ ⋮         
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+ 1.0  1.0  1.0
+</code></pre>
+<p>We must recenter our data about 0 to help the Turing sampler in initialising the parameter estimates. So, normalising the data in each column by subtracting the mean and dividing by the standard deviation:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># # Rescale our matrices.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="x">(</span><span class="n">data</span> <span class="o">.-</span> <span class="n">mean</span><span class="x">(</span><span class="n">data</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">))</span> <span class="o">./</span> <span class="n">std</span><span class="x">(</span><span class="n">data</span><span class="x">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>400×3 Array{Float64,2}:
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+ -0.998749  -0.998749  -0.576628
+  ⋮                    
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+  0.998749   0.998749   1.72988
+</code></pre>
+<h1 id="declaring-the-model-poisson-regression">Declaring the Model: Poisson Regression</h1>
+<p>Our model, <code>poisson_regression</code> takes four arguments:</p>
+<ul>
+<li><code>x</code> is our set of independent variables;</li>
+<li><code>y</code> is the element we want to predict;</li>
+<li><code>n</code> is the number of observations we have; and</li>
+<li><code>σ²</code> is the standard deviation we want to assume for our priors.</li>
+</ul>
+<p>Within the model, we create four coefficients (<code>b0</code>, <code>b1</code>, <code>b2</code>, and <code>b3</code>) and assign a prior of normally distributed with means of zero and standard deviations of <code>σ²</code>. We want to find values of these four coefficients to predict any given <code>y</code>.</p>
+<p>Intuitively, we can think of the coefficients as:</p>
+<ul>
+<li><code>b1</code> is the coefficient which represents the effect of taking alcohol on the number of sneezes;</li>
+<li><code>b2</code> is the coefficient which represents the effect of taking in no medicines on the number of sneezes;</li>
+<li><code>b3</code> is the coefficient which represents the effect of interaction between taking alcohol and no medicine on the number of sneezes;</li>
+</ul>
+<p>The <code>for</code> block creates a variable <code>theta</code> which is the weighted combination of the input features. We have defined the priors on these weights above. We then observe the likelihood of calculating <code>theta</code> given the actual label, <code>y[i]</code>.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Bayesian poisson regression (LR)</span>
+<span class="nd">@model</span> <span class="n">poisson_regression</span><span class="x">(</span><span class="n">x</span><span class="x">,</span> <span class="n">y</span><span class="x">,</span> <span class="n">n</span><span class="x">,</span> <span class="n">σ²</span><span class="x">)</span> <span class="o">=</span> <span class="k">begin</span>
+    <span class="n">b0</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span> <span class="n">σ²</span><span class="x">)</span>
+    <span class="n">b1</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span> <span class="n">σ²</span><span class="x">)</span>
+    <span class="n">b2</span> <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span> <span class="n">σ²</span><span class="x">)</span>
+    <span class="n">b3</span>  <span class="o">~</span> <span class="n">Normal</span><span class="x">(</span><span class="mi">0</span><span class="x">,</span> <span class="n">σ²</span><span class="x">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">b0</span> <span class="o">+</span> <span class="n">b1</span><span class="o">*</span><span class="n">x</span><span class="x">[</span><span class="n">i</span><span class="x">,</span> <span class="mi">1</span><span class="x">]</span> <span class="o">+</span> <span class="n">b2</span><span class="o">*</span><span class="n">x</span><span class="x">[</span><span class="n">i</span><span class="x">,</span><span class="mi">2</span><span class="x">]</span> <span class="o">+</span> <span class="n">b3</span><span class="o">*</span><span class="n">x</span><span class="x">[</span><span class="n">i</span><span class="x">,</span><span class="mi">3</span><span class="x">]</span>
+        <span class="n">y</span><span class="x">[</span><span class="n">i</span><span class="x">]</span> <span class="o">~</span> <span class="n">Poisson</span><span class="x">(</span><span class="n">exp</span><span class="x">(</span><span class="n">theta</span><span class="x">))</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="x">;</span>
+</code></pre></div></div>
+<h1 id="sampling-from-the-posterior">Sampling from the posterior</h1>
+<p>We use the <code>NUTS</code> sampler to sample values from the posterior. We run multiple chains using the <code>mapreduce</code> function to nullify the effect of a problematic chain. We then use the Gelman, Rubin, and Brooks Diagnostic to check the convergence of these multiple chains.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Retrieve the number of observations.</span>
+<span class="n">n</span><span class="x">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">size</span><span class="x">(</span><span class="n">data</span><span class="x">)</span>
+
+<span class="c"># Sample using NUTS.</span>
+
+<span class="n">num_chains</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">chain</span> <span class="o">=</span> <span class="n">mapreduce</span><span class="x">(</span>
+    <span class="n">c</span> <span class="o">-&gt;</span> <span class="n">sample</span><span class="x">(</span><span class="n">poisson_regression</span><span class="x">(</span><span class="n">data</span><span class="x">,</span> <span class="n">data_labels</span><span class="x">,</span> <span class="n">n</span><span class="x">,</span> <span class="mi">10</span><span class="x">),</span> <span class="n">NUTS</span><span class="x">(</span><span class="mi">200</span><span class="x">,</span> <span class="mf">0.65</span><span class="x">),</span> <span class="mi">2500</span><span class="x">,</span> <span class="n">discard_adapt</span><span class="o">=</span><span class="nb">false</span><span class="x">),</span> 
+    <span class="n">chainscat</span><span class="x">,</span> 
+    <span class="mi">1</span><span class="o">:</span><span class="n">num_chains</span><span class="x">);</span>
+</code></pre></div></div>
+<h1 id="viewing-the-diagnostics">Viewing the Diagnostics</h1>
+<p>We use the Gelman, Rubin, and Brooks Diagnostic to check whether our chains have converged. Note that we require multiple chains to use this diagnostic which analyses the difference between these multiple chains.</p>
+<p>We expect the chains to have converged. This is because we have taken sufficient number of iterations (1500) for the NUTS sampler. However, in case the test fails, then we will have to take a larger number of iterations, resulting in longer computation time.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gelmandiag</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>Gelman, Rubin, and Brooks Diagnostic
+  parameters      psrf     97.5%
+      Symbol   Float64   Float64
+
+          b0    1.1837    1.2110
+          b1    1.0544    1.0662
+          b2    1.0921    1.1034
+          b3    1.0392    1.0496
+</code></pre>
+<p>From the above diagnostic, we can conclude that the chains have converged because the PSRF values of the coefficients are close to 1.</p>
+<p>So, we have obtained the posterior distributions of the parameters. We transform the coefficients and recover theta values by taking the exponent of the meaned values of the coefficients <code>b0</code>, <code>b1</code>, <code>b2</code> and <code>b3</code>. We take the exponent of the means to get a better comparison of the relative values of the coefficients. We then compare this with the intuitive meaning that was described earlier.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Taking the first chain</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="n">chain</span><span class="x">[</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="x">,</span><span class="mi">1</span><span class="x">]</span>
+
+<span class="c"># Calculating the exponentiated means</span>
+<span class="n">b0_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">c1</span><span class="x">[</span><span class="o">:</span><span class="n">b0</span><span class="x">]))</span>
+<span class="n">b1_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">c1</span><span class="x">[</span><span class="o">:</span><span class="n">b1</span><span class="x">]))</span>
+<span class="n">b2_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">c1</span><span class="x">[</span><span class="o">:</span><span class="n">b2</span><span class="x">]))</span>
+<span class="n">b3_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="x">(</span><span class="n">mean</span><span class="x">(</span><span class="n">c1</span><span class="x">[</span><span class="o">:</span><span class="n">b3</span><span class="x">]))</span>
+
+<span class="n">print</span><span class="x">(</span><span class="s">"The exponent of the meaned values of the weights (or coefficients are): </span><span class="se">\n</span><span class="s">"</span><span class="x">)</span>
+<span class="n">print</span><span class="x">(</span><span class="s">"b0: "</span><span class="x">,</span> <span class="n">b0_exp</span><span class="x">,</span> <span class="s">" </span><span class="se">\n</span><span class="s">"</span><span class="x">,</span> <span class="s">"b1: "</span><span class="x">,</span> <span class="n">b1_exp</span><span class="x">,</span> <span class="s">" </span><span class="se">\n</span><span class="s">"</span><span class="x">,</span> <span class="s">"b2: "</span><span class="x">,</span> <span class="n">b2_exp</span><span class="x">,</span> <span class="s">" </span><span class="se">\n</span><span class="s">"</span><span class="x">,</span> <span class="s">"b3: "</span><span class="x">,</span> <span class="n">b3_exp</span><span class="x">,</span> <span class="s">" </span><span class="se">\n</span><span class="s">"</span><span class="x">)</span>
+<span class="n">print</span><span class="x">(</span><span class="s">"The posterior distributions obtained after sampling can be visualised as :</span><span class="se">\n</span><span class="s">"</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>The exponent of the meaned values of the weights (or coefficients are): 
+b0: 5.152685652153663 
+b1: 1.751720114652542 
+b2: 2.4342395089528917 
+b3: 1.326200167261916 
+The posterior distributions obtained after sampling can be visualised as :
+</code></pre>
+<p>Visualising the posterior by plotting it:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/07_poisson-regression_10_1.png" alt="" /></p>
+<h1 id="interpreting-the-obtained-mean-values">Interpreting the Obtained Mean Values</h1>
+<p>The exponentiated mean of the coefficient <code>b1</code> is roughly half of that of <code>b2</code>. This makes sense because in the data that we generated, the number of sneezes was more sensitive to the medicinal intake as compared to the alcohol consumption. We also get a weaker dependence on the interaction between the alcohol consumption and the medicinal intake as can be seen from the value of <code>b3</code>.</p>
+<h1 id="removing-the-warmup-samples">Removing the Warmup Samples</h1>
+<p>As can be seen from the plots above, the parameters converge to their final distributions after a few iterations. These initial values during the warmup phase increase the standard deviations of the parameters and are not required after we get the desired distributions. Thus, we remove these warmup values and once again view the diagnostics.</p>
+<p>To remove these warmup values, we take all values except the first 200. This is because we set the second parameter of the NUTS sampler (which is the number of adaptations) to be equal to 200. <code>describe(chain)</code> is used to view the standard deviations in the estimates of the parameters. It also gives other useful information such as the means and the quantiles.</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Note the standard deviation before removing the warmup samples</span>
+<span class="n">describe</span><span class="x">(</span><span class="n">chain</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>2-element Array{MCMCChains.ChainDataFrame,1}:
+ Summary Statistics (4 x 7)
+ Quantiles (4 x 6)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Removing the first 200 values of the chains.</span>
+<span class="n">chains_new</span> <span class="o">=</span> <span class="n">chain</span><span class="x">[</span><span class="mi">201</span><span class="o">:</span><span class="mi">2500</span><span class="x">,</span><span class="o">:</span><span class="x">,</span><span class="o">:</span><span class="x">]</span>
+<span class="n">describe</span><span class="x">(</span><span class="n">chains_new</span><span class="x">)</span>
+</code></pre></div></div>
+<pre><code>2-element Array{MCMCChains.ChainDataFrame,1}:
+ Summary Statistics (4 x 7)
+ Quantiles (4 x 6)
+</code></pre>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot</span><span class="x">(</span><span class="n">chains_new</span><span class="x">)</span>
+</code></pre></div></div>
+<p><img src="../figures/07_poisson-regression_13_1.png" alt="" /></p>
+<p>As can be seen from the numeric values and the plots above, the standard deviation values have decreased and all the plotted values are from the estimated posteriors. The exponentiated mean values, with the warmup samples removed, have not changed by much and they are still in accordance with their intuitive meanings as described earlier.</p>
+<h2 id="appendix">Appendix</h2>
+<p>This tutorial is part of the TuringTutorials repository, found at: <a href="https://github.com/TuringLang/TuringTutorials">https://github.com/TuringLang/TuringTutorials</a>.</p>
+<p>To locally run this tutorial, do the following commands:</p>
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">TuringTutorials</span>
+<span class="n">TuringTutorials</span><span class="o">.</span><span class="n">weave_file</span><span class="x">(</span><span class="s">"07-poisson-regression"</span><span class="x">,</span> <span class="s">"07_poisson-regression.jmd"</span><span class="x">)</span>
+</code></pre></div></div>
+<p>Computer Information:</p>
+<pre><code>Julia Version 1.5.3
+Commit 788b2c77c1 (2020-11-09 13:37 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-9.0.1 (ORCJIT, skylake)
+Environment:
+  JULIA_CMDSTAN_HOME = /home/cameron/stan/
+  JULIA_NUM_THREADS = 16
+
+</code></pre>
+<p>Package Information:</p>
+<pre><code>Status `~/.julia/dev/TuringTutorials/tutorials/07-poisson-regression/Project.toml`
+  [a93c6f00] DataFrames v1.0.1
+  [b4f34e82] Distances v0.10.2
+  [31c24e10] Distributions v0.24.18
+  [38e38edf] GLM v1.4.1
+  [c7f686f2] MCMCChains v4.9.0
+  [cc2ba9b6] MLDataUtils v0.5.4
+  [872c559c] NNlib v0.7.19
+  [91a5bcdd] Plots v1.12.0
+  [ce6b1742] RDatasets v0.7.5
+  [4c63d2b9] StatsFuns v0.9.8
+  [f3b207a7] StatsPlots v0.14.19
+  [fce5fe82] Turing v0.15.18
+  [9a3f8284] Random
+
+</code></pre>
+    
+<script
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function() {
+
+    var toc = $('#nav-toc');
+
+    // Select each header
+    sections = $('#md-container-pancakes h1');
+        $.each(sections, function(idx, v) {
+            section = $(v);
+            var div_id = $(section).attr('id');
+            var div_text = section.text().split('¶')[0];
+            var parent = $("#" + div_id)
+            var content = '<li id="link_' + div_id + '" class="md-nav__item"><a class="md-nav__link toc-side-bar" href="#' + div_id + '" title="' + div_text +'">' + div_text +'</a></li>';
+            $(toc).append(content);
+
+            // Add section code to subnavigation
+            var children = $('<nav class="md-nav"><ul class="md-nav__list"></nav></ul>')
+            var contenders = $("#" + div_id).nextUntil( "h1" );
+            $.each(contenders, function(idx, contender){
+            if($(contender).is('h2')) {
+                var contender_id = $(contender).attr('id');
+                var contender_text = $(contender).text().split('¶')[0];
+                var content = '<li class="md-nav__item"><a class="md-nav__link toc-side-bar" href="#' + contender_id + '" title="' + contender_text +'">' + contender_text +'</a></li>';
+                children.append(content);
+                }
+            })
+            $("#link_" + div_id).append(children);
+        });
+    });
+</script>
+    <!-- this will parse through the header fields and add a button to open
+     an issue / ask a question on Github. The editable field should be in
+     the post frontend matter, and refer to the label to open the issue for -->
+
+<style>
+.more {
+    float:right;
+    font-size: 1.0rem !important;
+}
+.more:hover {
+    color: cornflowerblue !important;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    font-weight: 200;
+    box-shadow: 0px 8px 6px 0px rgba(0,0,0,0.2);
+    padding: 0px 10px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
+
+
+    </article>
+</div>      
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="c-footer md-footer-nav">
+  <div class="md-footer-copyright__highlight">
+    
+    Turing is created by <a style="color:inherit; text-decoration: underline;" href="http://mlg.eng.cam.ac.uk/hong/">Hong Ge</a>, 
+    and lovingly maintained by the <a style="color:inherit; text-decoration: underline;" href="https://github.com/TuringLang/Turing.jl/graphs/contributors">core team</a> of volunteers.
+
+    <br><br>
+    
+    The contents of this website are
+© 2021 under the terms of the <a style="color:inherit; text-decoration: underline;" href="https://github.com/TuringLang/Turing.jl/blob/master/LICENCE">MIT License</a>.
+    
+  </div>  
+</footer>
+
+
+    <script src="/dev/assets/js/application.js"></script>
+    
+    <script>console.log('3')</script>
+    <script>app.initialize({version:"0.17.4", url:{base:'/dev'}})</script>
+
+    
+    <script src="/dev/assets/js/version-switch.js"></script>
+
+    <script>
+ var headers = ["h1", "h2", "h3", "h4"]
+ var colors = ["red", "orange", "green", "blue"]
+
+ $.each(headers, function(i, header){
+   var color = colors[i];
+   $(header).each(function () {
+     var href=$(this).attr("id");
+     $(this).append('<a class="headerlink" style="color:' + color + '" href="#' + href + '" title="Permanent link">¶</a>')
+   });
+ })
+
+ // Ensure that sidebar on left has arrows
+ $(".pancakes-parent").on('click', function(){
+   console.log($(this).next());
+   $(this).next().find('.pancakes-child').toggle();
+   if ($(this).hasClass('open-parent')){
+     $(this).removeClass('open-parent');
+   } else {
+     $(this).addClass('open-parent');
+   }
+ })
+
+ $(".pancakes-parent-mobile").on('click', function(){
+   var nav = $(this).next();
+   nav.addClass('mobile-sub-navbar-display');
+ })
+
+ $(".mobile-navbar-back").on('click', function(){
+   var nav = $(this).parent();
+   nav.removeClass('mobile-sub-navbar-display');
+ })
+
+</script>
+
+<script>
+ MathJax = {
+   tex: {
+     inlineMath: [['$', '$'], ['$$', '$$']]
+   }
+ };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+    <script>
+$('h1').first().append('<div></div>')</script>
+
+    <style>
+#scrolltop {
+  display: none; /* Hidden by default */
+  position: fixed; /* Fixed/sticky position */
+  bottom: 20px; /* Place the button at the bottom of the page */
+  right: 30px; /* Place the button 30px from the right */
+  z-index: 99; /* Make sure it does not overlap */
+  border: none; /* Remove borders */
+  outline: none; /* Remove outline */
+  background-color: #d2e6f5; /* Set a background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Add a mouse pointer on hover */
+  padding: 10px 15px; /* Some padding */
+  border-radius: 100px; /* Rounded corners */
+  font-size: 18px; /* Increase font size */
+  font-weight: 600;
+}
+
+#scrolltop:hover {
+  background-color: #555; /* Add a dark-grey background on hover */
+}
+</style>
+<button onclick="topFunction()" id="scrolltop" title="Go to top">🔝</button>
+
+<script>
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("scrolltop").style.display = "block";
+  } else {
+    document.getElementById("scrolltop").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+</script>
+
+    
+
+
+  </body>
+</html>
